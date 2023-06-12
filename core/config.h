@@ -1,0 +1,56 @@
+/*
+ * @Author: 苗金标
+ * @Date: 2023-04-03 11:13:37
+ * @LastEditors: 苗金标
+ * @LastEditTime: 2023-06-08 16:00:53
+ * @Description: 
+ */
+#pragma once
+#include <cstdint>
+#include "superScalar/super_config.h"
+
+const uint32_t FETCH_WIDTH = 2;
+const uint32_t FETCH_DECODE_FIFO_SIZE = 16;
+const uint32_t DECODE_WIDTH = 2;
+const uint32_t ISSUE_WIDTH = 2;
+const uint32_t DECODE_RENAME_FIFO_SIZE = 16;
+const uint32_t ISSUE_QUEUE_SIZE = 16;
+const uint32_t RENAME_WIDTH = 2;
+const uint32_t RENAME_ISSUE_FIFO_SIZE = 16;
+const uint32_t WB_WIDTH = 2;
+
+const uint32_t PHY_REG_NUM = 512;
+const uint32_t ARCH_REG_NUM= 32;
+
+const uint32_t RAS_SIZE = 256;
+const uint32_t ROB_SIZE = 64;
+const uint32_t STORE_BUFFER_SIZE = 16;
+const uint32_t GSHARE_PC_ADDR_WIDTH = 12;
+const uint32_t GSHARE_GLOBAL_HISTORY_WIDTH = GSHARE_PC_ADDR_WIDTH;
+const uint32_t GSHARE_PHT_ADDR_WIDTH = GSHARE_PC_ADDR_WIDTH;
+const uint32_t GSHARE_PHT_SIZE = 1u << GSHARE_PHT_ADDR_WIDTH;
+const uint64_t GSHARE_PC_ADDR_MASK = (1ull << GSHARE_PC_ADDR_WIDTH) - 1ull;
+const uint32_t GSHARE_GLOBAL_HISTORY_MASK = (1u << GSHARE_GLOBAL_HISTORY_WIDTH) - 1u;
+
+const uint32_t LOCAL_PC_ADDR_WIDTH = 12;
+const uint32_t LOCAL_BHT_ADDR_WIDTH = LOCAL_PC_ADDR_WIDTH;
+const uint32_t LOCAL_BHT_SIZE = 1u << LOCAL_BHT_ADDR_WIDTH;
+const uint32_t LOCAL_BHT_WIDTH = LOCAL_PC_ADDR_WIDTH;
+const uint32_t LOCAL_PHT_ADDR_WIDTH = LOCAL_PC_ADDR_WIDTH;
+const uint32_t LOCAL_PHT_SIZE = 1u << LOCAL_PHT_ADDR_WIDTH;
+const uint64_t LOCAL_PC_ADDR_MASK = (1ull << LOCAL_PC_ADDR_WIDTH) - 1ull;
+const uint32_t LOCAL_BHT_WIDTH_MASK = (1u << LOCAL_BHT_WIDTH) - 1u;
+
+const uint32_t CALL_PC_ADDR_WIDTH = 12;
+const uint32_t CALL_GLOBAL_HISTORY_WIDTH = CALL_PC_ADDR_WIDTH;
+const uint32_t CALL_TARGET_CACHE_ADDR_WIDTH = CALL_PC_ADDR_WIDTH;
+const uint32_t CALL_TARGET_CACHE_SIZE = 1u << CALL_TARGET_CACHE_ADDR_WIDTH;
+const uint64_t CALL_PC_ADDR_MASK = (1ull << CALL_PC_ADDR_WIDTH) - 1ull;
+const uint32_t CALL_GLOBAL_HISTORY_MASK = (1u << CALL_GLOBAL_HISTORY_WIDTH) - 1u;
+
+const uint32_t NORMAL_PC_ADDR_WIDTH = 12;
+const uint32_t NORMAL_GLOBAL_HISTORY_WIDTH = NORMAL_PC_ADDR_WIDTH;
+const uint32_t NORMAL_TARGET_CACHE_ADDR_WIDTH = NORMAL_PC_ADDR_WIDTH;
+const uint32_t NORMAL_TARGET_CACHE_SIZE = 1u << NORMAL_TARGET_CACHE_ADDR_WIDTH;
+const uint64_t NORMAL_PC_ADDR_MASK = (1ull << NORMAL_PC_ADDR_WIDTH) - 1ull;
+const uint32_t NORMAL_GLOBAL_HISTORY_MASK = (1u << NORMAL_GLOBAL_HISTORY_WIDTH) - 1u;

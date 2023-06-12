@@ -1,0 +1,272 @@
+/*
+ * @Author: 苗金标
+ * @Date: 2022-12-23 19:15:02
+ * @LastEditors: 苗金标
+ * @LastEditTime: 2023-05-31 20:14:10
+ * @Description: 
+ * #pragma once 是编译器支持的，可能有的编译器不支持
+ * #ifndef是C标准，所有编译器都支持
+ */
+#include <stdio.h>
+#include <filesystem>
+#include <stdlib.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "core/pipeline/plic.h"
+#include "core/pipeline/clint.h"
+#include "core/device/uartlite.h"
+
+#include "core/pipeline/fetch.h"
+#include "core/pipeline/decode.h"
+#include "core/pipeline/issue.h"
+#include "core/pipeline/execute/execute.h"
+#include "core/pipeline/wb.h"
+#include "core/memory/ram.h"
+#include "difftest.h"
+
+#include "core/superScalar/issue.h"
+
+// #include "core/component/bp/baseBp.h"
+#include "core/component/bp/branch_predict.h"
+#include "core/component/checkpoint_buffer.h"
+#include "core/component/rat.h"
+
+/***********************
+have not testing rv64mi、rv64si test set
+4.28:rv64mi、rv64si have tested,only rv64mi-p-illegal、rv64mi-p-zicntr need debug
+rv64ui-*-ma_data also need to be tested
+
+5.9: rv64mi-p-illegal test passed,rv64mi-p-zicntr test but cemu do not implement instret register ,in this project
+we implement it and test pass(cemu also do not implement pmpaddr and pmpconfig)
+rv64ui-*-ma_data have not tested, rv64mzicbo and rv64ssvnapot also be ignored,
+rv64uc donot need to be tested  
+**********************/
+
+
+#define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
+CPU_state cpu;
+
+
+component::memory mem(0,0x80000000);
+// const char *load_path = "test/rv64mi/rv64mi-p-illegal.bin";
+const char *load_path = "test/rv64ui/rv64ui-p-add.bin";
+// const char *load_path = "test/rv64um/rv64um-v-div.bin";
+// const char *load_path = "test/rv64ua/rv64ua-v-lrsc.bin";
+// const char *load_path = "test/fw_payload.bin";
+
+ram dram(4096ul*1024l*1024l,(unsigned long)0x0000,load_path);
+l2_cache <L2_WAYS,L2_NR_SETS,L2_SZLINE,32> l2;
+Clint<2> clint;
+Plic<4,4> plic;
+uartlite uart;
+Priv priv(&mem,0,l2);
+
+component::branch_predictor bp;
+component::checkpoint_buffer cp(16);
+
+component::fifo<fetch_decode_pack> fetch_decode_fifo(16);
+component::fifo<decode_issue_pack> decode_issue_fifo(16);
+component::fifo<instStr> issue_execute_fifo(16);
+component::fifo<instStr> execute_wb_fifo(16);
+
+static wb_feedback_pack wb_feedback_pack_t;
+static bru_feedback_pack bru_feedback_pack_t;
+
+static core::fetch fetch_s(0x80000000,priv,&mem,&fetch_decode_fifo,&bp,&cp);
+static core::decode decode_s(&fetch_decode_fifo,&decode_issue_fifo);
+static core::issue issue_s(&decode_issue_fifo,&issue_execute_fifo);
+static core::execute execu_s(&issue_execute_fifo,&execute_wb_fifo,priv);
+static core::wb wb_s(&execute_wb_fifo,priv,true,&bp,&cp);
+
+struct diff_context_t ref;
+void init(){
+    assert(l2.add_dev(0x2000000,0x10000,&clint));
+    assert(l2.add_dev(0xc000000,0x4000000,&plic));
+    assert(l2.add_dev(0x60100000,1024*1024,&uart));
+    assert(l2.add_dev(0x80000000,2048l*1024l*1024l,&dram));
+    std::ifstream file(load_path,std::ios::in | std::ios::binary);
+    file.read((char *)mem.mem,std::filesystem::file_size(load_path));
+    memset(&wb_feedback_pack_t,0,sizeof(wb_feedback_pack_t));
+  
+
+    //初始化寄存器
+    for(int i = 0;i < 32;i++){
+        cpu.gpr[i] = 0;
+        cpu.gpr_v[i] = true;
+    }
+    cpu.pc = 0x80000000;
+    init_difftest("./cemu-ref-so",load_path,true);
+    void* diff_context = get_cpu_state(0x80000000);
+    ref_difftest_regcpy(diff_context,DIFFTEST_TO_REF);
+    free(diff_context);
+
+    //itrace
+    // init_disasm("riscv64-pc-linux-gnu");
+    cpu.cycle = 0;
+}
+
+bool delay_cr = false;
+void exec_once(){
+    cpu.cycle++;
+    clint.set_time(cpu.cycle + 1);
+    plic.update_ext(1,uart.irq());
+    // meip、 msip、 mtip、 seip
+    bool meip = plic.get_int(0);
+    bool msip = clint.m_s_irq(0);
+    bool mtip = clint.m_t_irq(0);
+    bool seip = plic.get_int(1);
+
+    priv.inter_exec(meip,msip,mtip,seip);
+    wb_feedback_pack_t = wb_s.evaluate();
+    // printf("MAIN\tfeedback_enable:%d,feedback_flush:%d\n",wb_feedback_pack_t.enable,wb_feedback_pack_t.flush);
+    exe_feedback_t exe_feedback;
+    bru_feedback_pack_t = execu_s.evaluate(wb_feedback_pack_t,exe_feedback);
+    // printf("main\tmtvec:%lx\n",priv.get_mtvec());
+    issue_s.evaluate(wb_feedback_pack_t,exe_feedback);
+    decode_s.evaluate(wb_feedback_pack_t);
+    fetch_s.evaluate(bru_feedback_pack_t,wb_feedback_pack_t);
+    
+    // if(cpu.cycle == 1000)  cpu.gpr[20] = 0xa5a5;
+    // if(wb_feedback_pack_t.stepOne){
+    //   if(wb_feedback_pack_t.inter){
+    //     ref_difftest_exec(1,meip,msip,mtip,seip,cpu.cycle,true);
+    //   }
+    //   ref_difftest_exec(1,meip,msip,mtip,seip,cpu.cycle,true);
+    //   ref_difftest_regcpy(&ref,DIFFTEST_TO_DUT);
+    //   if(cpu.cycle > 96223980){
+    //     printf("debug_pc:%lx\n",wb_feedback_pack_t.debug_pc);
+    //   }
+    //   diff_checkregs(&ref,wb_feedback_pack_t.debug_pc);
+
+    // }
+    
+    while(uart.exist_tx()){
+      char c = uart.getc();
+      if(c == '\r') delay_cr = true;
+      else{
+        if(delay_cr && c != '\n') std::cout << "\r" << c;
+        else std::cout << c;
+        std::cout.flush();
+        delay_cr = false;
+      }
+    }
+}
+void exec(uint64_t n){
+    for(uint64_t i = 0;i < n;i++)
+        exec_once();
+}
+
+static int cmd_help(char *args);
+static int cmd_q(char *args) {
+  return -1;
+}
+static int cmd_c(char *args){
+    exec(-1);
+    return 0;
+}
+static int cmd_si(char *args) {
+  int steps;
+  if(args == NULL){ steps = 1; }
+  else sscanf(args,"%d",&steps);
+  exec(steps);
+  return 0;
+}
+static int cmd_info(char *args){
+    for(int i = 0;i < 32;i++){
+        printf("gpr[%02d]\t:%08lx\n",i,cpu.gpr[i]);
+    }
+    return 0;
+}
+static struct {
+  const char *name;
+  const char *description;
+  int (*handler) (char *);
+} cmd_table [] = {
+  { "help", "Display informations about all supported commands", cmd_help },
+  { "c", "Continue the execution of the program", cmd_c },
+  { "q", "Exit NEMU", cmd_q },
+  { "si", "Single step execution 单步执行", cmd_si },
+  { "info", "Print program status 打印程序状态", cmd_info },
+//   { "x", "Scan memory 扫描内存", cmd_x},
+//   { "p", "表达式求值", cmd_p },
+//   { "w", "set watchpoint", cmd_w},
+//   { "d", "delte watchpoint", cmd_d},
+  /* TODO: Add more commands */
+};
+
+#define NR_CMD ARRLEN(cmd_table)
+static int cmd_help(char *args) {
+  /* extract the first argument */
+  char *arg = strtok(NULL, " ");
+  int i;
+
+  if (arg == NULL) {
+    /* no argument given */
+    for (i = 0; i < NR_CMD; i ++) {
+      printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+    }
+  }
+  else {
+    for (i = 0; i < NR_CMD; i ++) {
+      if (strcmp(arg, cmd_table[i].name) == 0) {
+        printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+        return 0;
+      }
+    }
+    printf("Unknown command '%s'\n", arg);
+  }
+  return 0;
+}
+
+static char* rl_gets() {
+  static char *line_read = NULL;
+
+  if (line_read) {
+    free(line_read);
+    line_read = NULL;
+  }
+
+  line_read = readline("(miao) ");
+
+  if (line_read && *line_read) {
+    add_history(line_read);
+  }
+
+  return line_read;
+}
+void sdb_mainloop() {
+  for (char *str; (str = rl_gets()) != NULL; ) {
+    char *str_end = str + strlen(str);
+
+    /* extract the first token as the command */
+    char *cmd = strtok(str, " ");
+    if (cmd == NULL) { continue; }
+
+    /* treat the remaining string as the arguments,
+     * which may need further parsing
+     */
+    char *args = cmd + strlen(cmd) + 1;
+    if (args >= str_end) {
+      args = NULL;
+    }
+
+    int i;
+    for (i = 0; i < NR_CMD; i ++) {
+      if (strcmp(cmd, cmd_table[i].name) == 0) {
+        if (cmd_table[i].handler(args) < 0) { return; }
+        break;
+      }
+    }
+
+    if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
+  }
+}
+
+
+int main(int argc,char *argv[]){
+    
+    init();
+    sdb_mainloop();
+    return 0;
+}
+
