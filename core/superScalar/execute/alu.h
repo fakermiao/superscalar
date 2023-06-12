@@ -66,7 +66,7 @@ namespace Supercore{
             execute_channel evaluate(wb_feedback_pack wb_feedback);
 
             void alu_p(instStr& instInfo){
-                printf("%salu%s%d/%ld%s:\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
+                printf("%salu%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
                 printf("\t\trs1:%lx,rs2:%lx,result:%lx\n",instInfo.rs1_value,instInfo.rs2_value,instInfo.rd_value);
             }
     };

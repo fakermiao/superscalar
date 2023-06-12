@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-06-07 16:26:59
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-04-03 20:43:00
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-08 16:32:38
- * @Description: 
- */
 #pragma once
 #include "../component/fifo.h"
 #include "../component/issue_queue.h"
@@ -33,15 +26,15 @@ note 2.由于分支预测的存在，要执行的访存指令可能在分支预�
 namespace Supercore{
     class issue{
         public:
-            issue(component::fifo<rename_issue_pack> *rename_issue_fifo,component::fifo<instStr> **issue_alu_fifo,component::fifo<instStr> **issue_bru_fifo,
+            issue(component::issue_queue<instStr> &issue_q,component::fifo<rename_issue_pack> *rename_issue_fifo,component::fifo<instStr> **issue_alu_fifo,component::fifo<instStr> **issue_bru_fifo,
                 component::fifo<instStr> **issue_csr_fifo,component::fifo<instStr> **issue_lsu_fifo,component::fifo<instStr> **issue_mdu_fifo,
                 component::fifo<instStr> **issue_mou_fifo,component::regfile<uint64_t> *phy_regfile,component::checkpoint_buffer *cp) : 
-                issue_q(component::issue_queue<instStr>(ISSUE_QUEUE_SIZE)),rename_issue_fifo(rename_issue_fifo),issue_alu_fifo(issue_alu_fifo),
+                issue_q(issue_q),rename_issue_fifo(rename_issue_fifo),issue_alu_fifo(issue_alu_fifo),
                 issue_bru_fifo(issue_bru_fifo),issue_csr_fifo(issue_csr_fifo),issue_lsu_fifo(issue_lsu_fifo),issue_mdu_fifo(issue_mdu_fifo),
                 issue_mou_fifo(issue_mou_fifo),phy_regfile(phy_regfile),cp(cp){}
                 // decode_issue_fifo(decode_issue_fifo),issue_execute_fifo(issue_execute_fifo),issue_q(component::fifo<instStr>(ISSUE_QUEUE_SIZE))
                 // {}
-            component::issue_queue<instStr> issue_q;
+            component::issue_queue<instStr>& issue_q;
             component::fifo<rename_issue_pack> *rename_issue_fifo;
             component::fifo<instStr> **issue_alu_fifo;
             component::fifo<instStr> **issue_bru_fifo;

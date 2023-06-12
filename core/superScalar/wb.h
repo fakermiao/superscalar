@@ -84,8 +84,8 @@ typedef struct wb_feedback_pack{
             virtual wb_feedback_pack evaluate();
 
             void wb_p(uint32_t num,component::rob_item& item){
-                printf("%sWB%s%d/%ld%s:\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,item.pc,item.inst);
-                printf("\t\trd:%d,rd_value:%lx",item.Preg,item.rd_value);
+                printf("%sWB%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,item.pc,item.inst);
+                printf("\t\trd:%d,rd_value:%lx\n",item.Preg,item.rd_value);
                 // printf("\t\tpredicted:%d,pred_jump:%d,pred_pc:%lx\n",instInfo.predicted,instInfo.predicted_jump,instInfo.predicted_next_pc);
             }
     };

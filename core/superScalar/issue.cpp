@@ -28,22 +28,22 @@ namespace Supercore{
                 bool mdu_unit_used[MDU_UNIT_NUM];
                 bool mou_unit_used[MOU_UNIT_NUM];
                 for(uint32_t i = 0;i < ALU_UNIT_NUM;i++){
-                    alu_unit_used[i] = !issue_alu_fifo[i]->is_full();
+                    alu_unit_used[i] = issue_alu_fifo[i]->is_full();
                 }
                 for(uint32_t i = 0;i < BRU_UNIT_NUM;i++){
-                    bru_unit_used[i] = !issue_bru_fifo[i]->is_full();
+                    bru_unit_used[i] = issue_bru_fifo[i]->is_full();
                 }
                 for(uint32_t i = 0;i < CSR_UNIT_NUM;i++){
-                    csr_unit_used[i] = !issue_csr_fifo[i]->is_full();
+                    csr_unit_used[i] = issue_csr_fifo[i]->is_full();
                 }
                 for(uint32_t i = 0;i < LSU_UNIT_NUM;i++){
-                    lsu_unit_used[i] = !issue_lsu_fifo[i]->is_full();
+                    lsu_unit_used[i] = issue_lsu_fifo[i]->is_full();
                 }
                 for(uint32_t i = 0;i < MDU_UNIT_NUM;i++){
-                    mdu_unit_used[i] = !issue_mdu_fifo[i]->is_full();
+                    mdu_unit_used[i] = issue_mdu_fifo[i]->is_full();
                 }
                 for(uint32_t i = 0;i < MOU_UNIT_NUM;i++){
-                    mou_unit_used[i] = !issue_mou_fifo[i]->is_full();
+                    mou_unit_used[i] = issue_mou_fifo[i]->is_full();
                 }
                 //遍历发射队列找到可以发射的指令
                 do{
@@ -102,42 +102,42 @@ namespace Supercore{
                         component::fifo<instStr> **unit_fifo = NULL;
                         switch(cur_inst.fuType){
                             case FuType::alu:{
-                                while((unit_num < ALU_UNIT_NUM) && (!alu_unit_used[unit_num])){unit_num++;}
+                                while((unit_num < ALU_UNIT_NUM) && (alu_unit_used[unit_num])){unit_num++;}
                                 issued = unit_num < ALU_UNIT_NUM;
                                 alu_unit_used[unit_num] = true;
                                 unit_fifo = issue_alu_fifo;
                                 break;
                             }
                             case FuType::bru:{
-                                while((unit_num < BRU_UNIT_NUM) && (!bru_unit_used[unit_num])){unit_num++;}
+                                while((unit_num < BRU_UNIT_NUM) && (bru_unit_used[unit_num])){unit_num++;}
                                 issued = unit_num < BRU_UNIT_NUM;
                                 bru_unit_used[unit_num] = true;
                                 unit_fifo = issue_bru_fifo;
                                 break;
                             }
                             case FuType::csr:{
-                                while((unit_num < CSR_UNIT_NUM) && (!csr_unit_used[unit_num])){unit_num++;}
+                                while((unit_num < CSR_UNIT_NUM) && (csr_unit_used[unit_num])){unit_num++;}
                                 issued = unit_num < CSR_UNIT_NUM;
                                 csr_unit_used[unit_num] = true;
                                 unit_fifo = issue_csr_fifo;
                                 break;
                             }
                             case FuType::lsu:{
-                                while((unit_num < LSU_UNIT_NUM) && (!lsu_unit_used[unit_num])){unit_num++;}
+                                while((unit_num < LSU_UNIT_NUM) && (lsu_unit_used[unit_num])){unit_num++;}
                                 issued = unit_num < LSU_UNIT_NUM;
                                 lsu_unit_used[unit_num] = true;
                                 unit_fifo = issue_lsu_fifo;
                                 break;
                             }
                             case FuType::mdu:{
-                                while((unit_num < MDU_UNIT_NUM) && (!mdu_unit_used[unit_num])){unit_num++;}
+                                while((unit_num < MDU_UNIT_NUM) && (mdu_unit_used[unit_num])){unit_num++;}
                                 issued = unit_num < MDU_UNIT_NUM;
                                 mdu_unit_used[unit_num] = true;
                                 unit_fifo = issue_mdu_fifo;
                                 break;
                             }
                             case FuType::mou:{
-                                while((unit_num < MOU_UNIT_NUM) && (!mou_unit_used[unit_num])){unit_num++;}
+                                while((unit_num < MOU_UNIT_NUM) && (mou_unit_used[unit_num])){unit_num++;}
                                 issued = unit_num < MOU_UNIT_NUM;
                                 mou_unit_used[unit_num] = true;
                                 unit_fifo = issue_mou_fifo;
@@ -152,6 +152,7 @@ namespace Supercore{
                         }
                     }
                 }while(issue_q.get_next_id(id,&id) && (id != first_id) && (issued_list.size() < ISSUE_WIDTH));
+                this->issue_q.compress_sync(issued_list);
             }
 
             //step2.接收exectue、wb执行返回唤醒issue_q队列的指令

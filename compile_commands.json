@@ -1,0 +1,290 @@
+[
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/issue.o",
+            "core/superScalar/issue.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/issue.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/pipeline/wb.o",
+            "core/pipeline/wb.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/pipeline/wb.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/execute/mdu.o",
+            "core/superScalar/execute/mdu.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/execute/mdu.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/execute/mou.o",
+            "core/superScalar/execute/mou.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/execute/mou.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/pipeline/issue.o",
+            "core/pipeline/issue.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/pipeline/issue.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/fetch.o",
+            "core/superScalar/fetch.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/fetch.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/rename.o",
+            "core/superScalar/rename.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/rename.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./main.o",
+            "main.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "main.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/execute/alu.o",
+            "core/superScalar/execute/alu.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/execute/alu.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/pipeline/execute/execute.o",
+            "core/pipeline/execute/execute.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/pipeline/execute/execute.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/execute/bru.o",
+            "core/superScalar/execute/bru.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/execute/bru.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/execute/lsu.o",
+            "core/superScalar/execute/lsu.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/execute/lsu.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/pipeline/decode.o",
+            "core/pipeline/decode.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/pipeline/decode.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/decode.o",
+            "core/superScalar/decode.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/decode.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/wb.o",
+            "core/superScalar/wb.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/wb.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/pipeline/rename.o",
+            "core/pipeline/rename.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/pipeline/rename.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/superScalar/execute/csr.o",
+            "core/superScalar/execute/csr.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/superScalar/execute/csr.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-O2",
+            "-std=c++17",
+            "-Wall",
+            "-Werror",
+            "-fno-strict-aliasing",
+            "-o",
+            "/root/superscalar/super1/build/obj/./core/pipeline/fetch.o",
+            "core/pipeline/fetch.cpp"
+        ],
+        "directory": "/root/superscalar/super1",
+        "file": "core/pipeline/fetch.cpp"
+    }
+]

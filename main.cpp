@@ -37,7 +37,6 @@
 #include "core/component/checkpoint_buffer.h"
 #include "core/component/rat.h"
 #include "core/component/store_buffer.h"
-#include "difftest.h"
 
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
 CPU_state cpu;
@@ -62,6 +61,7 @@ component::checkpoint_buffer cp(16);
 component::rat rat(PHY_REG_NUM,ARCH_REG_NUM);
 component::rob rob(ROB_SIZE);
 component::store_buffer storeBuffer(STORE_BUFFER_SIZE);
+component::issue_queue<instStr> issue_q(ISSUE_QUEUE_SIZE);
 component::regfile<uint64_t> phy_regfile(PHY_REG_NUM);
 component::fifo<instStr> *issue_alu_fifo[ALU_UNIT_NUM];
 component::fifo<instStr> *issue_bru_fifo[BRU_UNIT_NUM];
@@ -92,7 +92,7 @@ static Supercore::exe_feedback_t exe_feedback;
 Supercore::fetch  fetch_stage(0x80000000,priv,&mem,&fetch_decode_fifo,&bp,&cp);
 Supercore::decode decode_stage(&fetch_decode_fifo,&decode_rename_fifo);
 Supercore::rename rename_stage(&decode_rename_fifo,&rename_issue_fifo,&rat,&rob,&cp);
-Supercore::issue  issue_stage(&rename_issue_fifo,issue_alu_fifo,issue_bru_fifo,issue_csr_fifo,issue_lsu_fifo,issue_mdu_fifo,
+Supercore::issue  issue_stage(issue_q,&rename_issue_fifo,issue_alu_fifo,issue_bru_fifo,issue_csr_fifo,issue_lsu_fifo,issue_mdu_fifo,
                           issue_mou_fifo,&phy_regfile,&cp);
 Supercore::alu    *alu_stage[ALU_UNIT_NUM];
 Supercore::bru    *bru_stage[BRU_UNIT_NUM];
@@ -103,7 +103,6 @@ Supercore::mou    *mou_stage[MOU_UNIT_NUM];
 Supercore::wb     wb_stage(priv,true,&bp,&cp,alu_wb_fifo,bru_wb_fifo,csr_wb_fifo,lsu_wb_fifo,mdu_wb_fifo,mou_wb_fifo,
                             &rat,&rob,&phy_regfile,&storeBuffer);
 
-struct diff_context_t ref;
 void init(){
     assert(l2.add_dev(0x2000000,0x10000,&clint));
     assert(l2.add_dev(0xc000000,0x4000000,&plic));
@@ -205,6 +204,7 @@ void exec_once(){
     storeBuffer.sync();
     cp.sync();
     phy_regfile.sync();
+    issue_q.sync();
     printf("\n");
 }
 

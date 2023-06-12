@@ -70,7 +70,7 @@ namespace component{
             }
 
             void set_item(uint32_t item_id,T item){
-                assert(check_id_valid(item));
+                assert(check_id_valid(item_id));
                 this->buffer[item_id] = item;
             }
 
@@ -87,7 +87,7 @@ namespace component{
                 if((issued_list.size() > 0) && get_front_id(&first_id)){
                     auto cur_id     = first_id;
                     bool cur_stage  = this->rstage;
-                    auto i          = 0;
+                    uint32_t i          = 0;
                     auto item_issued_found= false;
                     auto next_id    = first_id;
                     bool new_wstage = this->rstage;
