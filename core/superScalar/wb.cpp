@@ -47,6 +47,7 @@ namespace Supercore{
                 phy_regfile->set_valid_sync(item.OPreg,true);
             }
         }while((tail_id != head_id) && (rob->get_prev_id(tail_id,&tail_id)));
+        printf("interrupt handler\n");
         rob->flush();
         cp->flush();
         store_buffer->flush();
@@ -66,6 +67,7 @@ namespace Supercore{
                 phy_regfile->set_valid_sync(item.OPreg,true);
             }
         }while((tail_id != head_id) && (rob->get_prev_id(tail_id,&tail_id)));
+        printf("execption handler\n");
         rob->flush();
         cp->flush();
         store_buffer->flush();
@@ -132,6 +134,10 @@ namespace Supercore{
         component::rob_item rob_item;
         memset(&rob_item,0,sizeof(rob_item));
         uint32_t commit_num = 0;
+
+        uint32_t arch10_feedback = 0;
+        uint32_t arch10_feedback_v = false;
+        uint64_t arch10_feedback_value = 0;
         while(!rob->is_empty() && commit_num < WB_WIDTH){
             rv_exc_code int_code = priv.check_and_raise_int();
             if(int_code != exc_custom_ok && (!priv.need_trap())){
@@ -158,6 +164,15 @@ namespace Supercore{
                                     phy_10 = 0;
                                 }
                                 if(rv_test && phy_regfile->read_data_valid(phy_17) && (phy_regfile->read_data(phy_17) == 93)){
+                                    if(arch10_feedback_v){
+                                        if(arch10_feedback_value == 0){
+                                            printf("***Test Pass***\n");
+                                            exit(0);
+                                        }else{
+                                            printf("---Test Failed with Value 0x%lx\n",phy_regfile->read_data(phy_10));
+                                            exit(0);
+                                        }
+                                    }
                                     if(phy_regfile->read_data_valid(phy_10) && (phy_regfile->read_data(phy_10) == 0)){
                                         printf("***Test Pass***\n");
                                         exit(0);
@@ -184,6 +199,16 @@ namespace Supercore{
                             feed_pack.wb_channel[commit_num].rd_id     = rob_item.rd_id;
                             feed_pack.wb_channel[commit_num].rd_value  = rob_item.rd_value;
                             phy_regfile->write_sync(rob_item.Preg,rob_item.rd_value,true);
+                            
+                            {
+                                //for riscv test
+                                if(!rat->get_phy_id(10,&arch10_feedback))
+                                    arch10_feedback = 0;
+                                if(arch10_feedback == rob_item.Preg){
+                                    arch10_feedback_v = true;
+                                    arch10_feedback_value = rob_item.rd_value;
+                                }
+                            }
 
                             //for debug
                             uint32_t arch_id = rat->get_arch_id(rob_item.Preg);
@@ -213,8 +238,11 @@ namespace Supercore{
                                     case LSUOpType::amoaddw: case LSUOpType::amoxorw: case LSUOpType::amoandw: case LSUOpType::amoorw:
                                     case LSUOpType::amominw: case LSUOpType::amomaxw: case LSUOpType::amominuw: case LSUOpType::amomaxuw:{
                                         component::store_buffer_item store_item;
+                                        // memset(&store_item,0,sizeof(store_item));
+                                        store_buffer->print();
                                         store_buffer->pop(&store_item);
                                         assert(store_item.enable);
+                                        // printf("write pc:%lx,addr:%lx,value:%ld\n",store_item.pc,store_item.addr,store_item.data);
                                         priv.va_write(store_item.addr,store_item.size,(unsigned char*)&store_item.data);
                                         break;
                                     }
@@ -225,14 +253,34 @@ namespace Supercore{
                                 if(rob_item.predicted){   
                                     if((rob_item.bru_jump == rob_item.predicted_jump) && ((rob_item.bru_next_pc == rob_item.predicted_next_pc) ||
                                         (!rob_item.predicted_jump))){
+                                            // printf("branch predicted hit\n");
                                         bp->update_prediction(rob_item.pc,rob_item.inst,rob_item.bru_jump,rob_item.bru_next_pc,true,0);
                                         cp->pop();
                                     }else if(rob_item.checkpoint_id_valid){
+                                        // printf("branch predicted miss\n");
                                         auto cp_t = cp->get_item(rob_item.checkpoint_id);
                                         bp->update_prediction(rob_item.pc,rob_item.inst,rob_item.bru_jump,rob_item.bru_next_pc,false,cp_t.global_history);
+                                        if(rob_item.OPreg_v){
+                                            // printf("hello:%d\n",rob_item.OPreg);
+                                            rat->cp_release_map(cp_t,rob_item.OPreg);
+                                        }
+                                        uint32_t _cnt = 0;
+                                        for(uint32_t i = 0;i < PHY_REG_NUM;i++){
+                                            if(!rat->cp_get_visible(cp_t,i)){
+                                                rat->cp_set_valid(cp_t,i,false);
+                                                phy_regfile->cp_set_data_valid(cp_t,i,false);
+                                            }else{
+                                                phy_regfile->cp_set_data_valid(cp_t,i,true);
+                                                _cnt++;
+                                            }
+                                        }
+                                        assert(_cnt == 32);//32个寄存器，0号寄存器始终映射为0
+
+                                        
                                         rat->restore_sync(cp_t);
                                         phy_regfile->restore_sync(cp_t);
                                         cp->flush();
+                                        // rat->flush();
                                         rob->flush();
                                         store_buffer->flush();
                                         feed_pack.enable = true;
@@ -243,6 +291,10 @@ namespace Supercore{
                                         assert(false);
                                     }
                                 }else{
+                                    cp->flush();
+                                    // rat->flush();
+                                    rob->flush();
+                                    store_buffer->flush();
                                     feed_pack.enable = true;
                                     feed_pack.flush  = true;
                                     feed_pack.bru_flush = true;

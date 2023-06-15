@@ -109,7 +109,6 @@ namespace Supercore{
                 }
             }
         }else{
-            // printf("hello:%lx\n",wb_feedback_pack_t.next_pc);
             this->jump_wait = false;
             this->fetch_decode_fifo->flush();
             if(wb_feedback_pack_t.bru_flush){

@@ -38,7 +38,7 @@ namespace Supercore{
             virtual void evaluate(wb_feedback_pack wb_feedback_pack_t);
 
             void decode_p(uint32_t num,instStr& instInfo){
-                printf("%sdecode%s%d/%ld%s:\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
+                printf("%sdecode%s%d/%ld%s:\tpc:%lx,inst:%x,valid:%d\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst,instInfo.valid);
                 printf("\t\trs1_valid:%d,rs1_id:%d--rs2_valid:%d,rs2_id:%d--rd_valid:%d,rd_id:%d\n",instInfo.rs1_valid,instInfo.rs1_id,instInfo.rs2_valid,
                 instInfo.rs2_id,instInfo.rd_valid,instInfo.rd_id);
             }

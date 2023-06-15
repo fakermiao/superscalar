@@ -20,6 +20,7 @@ namespace Supercore{
                     int64_t alu_result = 0;
                     int64_t src1 = instInfo.rs1_value;
                     int64_t src2 = instInfo.rs2_valid ? instInfo.rs2_value : instInfo.imm;
+                    // printf("alu\tsrc1:%lx,src2:%lx\n",src1,src2);
                     switch(instInfo.fuOpType.aluOp){
                         case ALUOpType::lui:{
                             alu_result = instInfo.imm;
@@ -70,7 +71,7 @@ namespace Supercore{
                             break;
                         }
                         case ALUOpType::addw:{
-                            alu_result = (int32_t)((int32_t)src1 - (int32_t)src2);
+                            alu_result = (int32_t)((int32_t)src1 + (int32_t)src2);
                             break;
                         }
                         case ALUOpType::subw:{
@@ -95,7 +96,7 @@ namespace Supercore{
                             break;
                         }
                     }
-
+                    // printf("alu\t src1:%lx,src2:%lx,result:%lx\n",src1,src2,alu_result);
 
                     instInfo.rd_enable      = true;
                     instInfo.rd_value       = alu_result;

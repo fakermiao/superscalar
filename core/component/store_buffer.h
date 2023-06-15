@@ -73,6 +73,7 @@ namespace component{
             uint64_t get_value(uint64_t addr,uint64_t size,uint64_t mem_value){
                 uint64_t result = mem_value;
                 uint32_t cur_id;
+                this->print();
                 if(get_front_id(&cur_id)){
                     auto first_id = cur_id;
                     do{
@@ -95,7 +96,7 @@ namespace component{
                             if((cur_item.addr >= addr) && (cur_item.addr < (addr + size))){
                                 uint64_t bit_offset = (cur_item.addr - addr) * 8;
                                 uint64_t bit_length = std::min(cur_item.size,addr + size - cur_item.addr) * 8;
-                                uint64_t bit_mask   = (bit_length == 64) ? 0xffffffffffffffff : ((1 << bit_length) - 1);
+                                uint64_t bit_mask   = (bit_length == 64) ? 0xffffffffffffffff : ((1ul << bit_length) - 1);
                                 result &= ~(bit_mask << bit_offset);
                                 result |= (cur_item.data & bit_mask) << bit_offset;
 
@@ -115,7 +116,15 @@ namespace component{
             void push_sync(store_buffer_item item){
                 sync_request req_t;
                 req_t.req = sync_request_type::push;
+                req_t.store_buffer_item_t = item;
                 sync_request_q.push(req_t);
+            }
+            
+            void print(){
+                if(this->is_empty())
+                    return;
+                for(uint32_t i = this->rptr;i != this->wptr;i = (i + 1) % size)
+                    printf("store print pc:%lx,addr:%lx,data:%lx\n",this->buffer[i].pc,this->buffer[i].addr,this->buffer[i].data);
             }
 
             void sync(){
@@ -124,6 +133,7 @@ namespace component{
                     sync_request_q.pop();
                     switch(req_t.req){
                         case sync_request_type::push:
+                            // printf("store_buffer push pc:%lx\n",req_t.store_buffer_item_t.pc);
                             this->push(req_t.store_buffer_item_t);
                             break;
                         default:

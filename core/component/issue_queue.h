@@ -98,6 +98,7 @@ namespace component{
                         if(!item_issued_found){
                             if((i < issued_list.size()) && (cur_id == issued_list[i])){
                                 item_issued_found = true;
+                                i++;//fix compress error
                                 next_id = cur_id;
                                 new_wstage = cur_stage;
                                 new_wptr = cur_id;
@@ -112,7 +113,6 @@ namespace component{
                             }
                         }
                     }while(get_next_id_stage(cur_id,cur_stage,&cur_id,&cur_stage) && (cur_id != first_id));
-
                     this->wptr = new_wptr;
                     this->wstage = new_wstage;
                 }

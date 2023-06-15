@@ -197,6 +197,7 @@ union rv_instr {
         int     imm_20      : 1;
     } j_type;
 };
+#define BITSIZE(X) (sizeof(X) * 8)
 #define SEXT(x, len) ({ struct { int64_t n : len; } __x = { .n = x }; (uint64_t)__x.n; })
 #define BITMASK(bits) ((1ull << (bits)) - 1)
 #define BITS(x, hi, lo) (((x) >> (lo)) & BITMASK((hi) - (lo) + 1)) // similar to x[hi:lo] in verilog
@@ -204,8 +205,8 @@ union rv_instr {
 inline uint64_t sign_extend(uint64_t imm, uint64_t imm_length)
 {
     assert((imm_length > 0) && (imm_length < 64));
-    auto sign_bit = (imm >> (imm_length - 1));
-    auto extended_imm = ((sign_bit == 0) ? 0 : (((sign_bit << (64 - imm_length)) - 1) << imm_length)) | imm;
+    auto sign_bit = (imm >> (imm_length - 1)) << 63;
+    auto extended_imm = ((sign_bit == 0) ? 0 : (((sign_bit << (64 - imm_length)) - 1) << imm_length)) | (imm << (64 - imm_length) >> (64 - imm_length));
     return extended_imm;
 }
 

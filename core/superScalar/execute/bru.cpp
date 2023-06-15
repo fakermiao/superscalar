@@ -20,6 +20,7 @@ namespace Supercore{
             if(!issue_bru_fifo->is_empty() && !bru_wb_fifo->is_full()){
                 instStr instInfo;
                 this->issue_bru_fifo->pop(&instInfo);
+                // printf("bru\trs1:%lx,rs2:%lx\n",instInfo.rs1_value,instInfo.rs2_value);
                 if(instInfo.valid){
                     bool jump = false;
                     uint64_t jump_pc = 0;
@@ -70,6 +71,7 @@ namespace Supercore{
                         }
                     }    
                     //异常检查
+                    jump_pc &= ~1;
                     if(instInfo.fuOpType.bruOp == BRUOpType::jal){
                         if(jump_pc % 4){
                             instInfo.has_execp  = true;
@@ -77,6 +79,7 @@ namespace Supercore{
                             instInfo.execp_value = jump_pc;
                             instInfo.rd_enable  = false;
                             exe_channel.rd_enable = false;
+                            printf("jal execption\n");
                         }else{
                             instInfo.rd_enable = true;
                             instInfo.rd_value  = instInfo.pc + 4;
@@ -91,6 +94,7 @@ namespace Supercore{
                             instInfo.execp_value = jump_pc;
                             instInfo.rd_enable = false;
                             exe_channel.rd_enable = false;
+                            printf("jalr execption pc:%lx\n",jump_pc);
                         }else{
                             instInfo.rd_enable = true;
                             instInfo.rd_value  = instInfo.pc + 4;
@@ -103,6 +107,7 @@ namespace Supercore{
                             instInfo.has_execp = true;
                             instInfo.execp_id  = exc_instr_misalign;
                             instInfo.execp_value = jump_pc;
+                            printf("bru execption\n");
                         }
                     }
                     instInfo.bru_jump = jump;

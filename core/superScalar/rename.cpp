@@ -1,12 +1,5 @@
 /*
  * @Author: 苗金标
- * @Date: 2023-05-29 16:53:11
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-06-09 20:57:07
- * @Description: 
- */
-/*
- * @Author: 苗金标
  * @Date: 2023-05-25 17:26:54
  * @LastEditors: 苗金标
  * @LastEditTime: 2023-05-26 19:31:10
@@ -15,6 +8,7 @@
  *      1.逻辑寄存器重命名（考虑超标量同一周期多条指令的相关性）
  *      2.分发，将指令相关信息放入重排序缓存
  *      3.保存状态，检测指令如果是分支预测指令将rat相关信息保存checkpoint
+ * 0613:fix rs2 dependcy bug
  */
 #include "rename.h"
 namespace Supercore{
@@ -70,11 +64,21 @@ namespace Supercore{
                                 send_pack.rename_issue[i].rd_phy = rob_item_t[i].Preg;
                                 //have bugs
                                 rat->set_map_sync(rob_item_t[i].Areg,rob_item_t[i].Preg);
+                                rat->cp_set_map(brs_cp,rob_item_t[i].Areg,rob_item_t[i].Preg);//更新最新映射关系，set_map_sync有延迟
                             }else{
                                 rob_item_t[i].OPreg_v   = false;
                                 rob_item_t[i].OPreg     = 0;
                                 rob_item_t[i].Preg      = 0; 
                                 send_pack.rename_issue[i].rd_phy = 0;
+                            }
+
+                            if(rev_pack.decode_issue[i].valid && rev_pack.decode_issue[i].predicted && rev_pack.decode_issue[i].checkpoint_id_valid){
+                                component::checkpoint_t cp_t,cp_s;
+                                brs_cp.clone(cp_t);
+                                cp_s = cp->get_item(rev_pack.decode_issue[i].checkpoint_id);
+                                cp_t.global_history = cp_s.global_history;
+                                cp_t.local_history  = cp_s.local_history;
+                                cp->set_item_sync(rev_pack.decode_issue[i].checkpoint_id,cp_t);
                             }
                         }
                     }
@@ -86,6 +90,7 @@ namespace Supercore{
                                 assert(rat->get_phy_id(rev_pack.decode_issue[i].rs1_id,&send_pack.rename_issue[i].rs1_phy));
                             }
                             if(rev_pack.decode_issue[i].rs2_valid && (rev_pack.decode_issue[i].rs2_id != 0)){
+                                // printf("inst:%x,rs2_id:%d\n",rev_pack.decode_issue[i].inst,rev_pack.decode_issue[i].rs2_id);
                                 assert(rat->get_phy_id(rev_pack.decode_issue[i].rs2_id,&send_pack.rename_issue[i].rs2_phy));
                             }
                         }
@@ -118,7 +123,7 @@ namespace Supercore{
 
                                     if(rev_pack.decode_issue[i].rs2_valid && (rev_pack.decode_issue[i].rs2_id != 0)
                                         && (rev_pack.decode_issue[i].rs2_id == rev_pack.decode_issue[j].rd_id)){
-                                            send_pack.rename_issue[i].rs2_phy = rob_item_t[i].Preg;
+                                            send_pack.rename_issue[i].rs2_phy = rob_item_t[j].Preg;
                                     }
                                 }
                             }
@@ -130,14 +135,14 @@ namespace Supercore{
                             //write rob
                             assert(rob->push(rob_item_t[i],&send_pack.rename_issue[i].rob_id));
 
-                            if(rev_pack.decode_issue[i].valid && rev_pack.decode_issue[i].predicted && rev_pack.decode_issue[i].checkpoint_id_valid){
-                                component::checkpoint_t cp_t,cp_s;
-                                brs_cp.clone(cp_t);
-                                cp_s = cp->get_item(rev_pack.decode_issue[i].checkpoint_id);
-                                cp_t.global_history = cp_s.global_history;
-                                cp_t.local_history  = cp_s.local_history;
-                                cp->set_item_sync(rev_pack.decode_issue[i].checkpoint_id,cp_t);
-                            }
+                            // if(rev_pack.decode_issue[i].valid && rev_pack.decode_issue[i].predicted && rev_pack.decode_issue[i].checkpoint_id_valid){
+                            //     component::checkpoint_t cp_t,cp_s;
+                            //     brs_cp.clone(cp_t);
+                            //     cp_s = cp->get_item(rev_pack.decode_issue[i].checkpoint_id);
+                            //     cp_t.global_history = cp_s.global_history;
+                            //     cp_t.local_history  = cp_s.local_history;
+                            //     cp->set_item_sync(rev_pack.decode_issue[i].checkpoint_id,cp_t);
+                            // }
                             this->rename_p(i,send_pack.rename_issue[i]);
                         }
                     }

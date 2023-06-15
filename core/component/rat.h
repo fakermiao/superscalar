@@ -97,6 +97,7 @@ namespace component{
             }            
 
             void restore_map(uint32_t new_phy_id,uint32_t old_phy_id){
+                // printf("restore_map new_phy_id:%d,old_phy_id:%d\n",new_phy_id,old_phy_id);
                 assert(new_phy_id < phy_reg_num);
                 assert(old_phy_id < phy_reg_num);
                 assert(get_valid(new_phy_id));
@@ -111,6 +112,7 @@ namespace component{
             }
 
             void release_map(uint32_t phy_id){
+                // printf("release map:%d\n",phy_id);
                 assert(phy_id < phy_reg_num);
                 assert(get_valid(phy_id));
                 assert(!get_visible(phy_id));
@@ -132,7 +134,7 @@ namespace component{
 
             bool get_phy_id(uint32_t arch_id,uint32_t *phy_id){
                 int cnt = 0;
-
+                // printf("arch_id:%d,phy_id:%d,valid:%d,visible:%d\n",arch_id,phy_map_table[4],get_valid(4),get_visible(4));
                 assert((arch_id >0) && (arch_id < arch_reg_num));
                 for(uint32_t i = 0;i < phy_reg_num;i++){
                     if(get_valid(i) && get_visible(i) && (phy_map_table[i] == arch_id)){
@@ -149,7 +151,6 @@ namespace component{
             }
             
             uint32_t set_map(uint32_t arch_id,uint32_t phy_id){
-                // printf("set map: arch_id:%d,phy_id:%d\n",arch_id,phy_id);
                 uint32_t old_phy_id;
                 assert(phy_id < phy_reg_num);
                 assert((arch_id > 0) && (arch_id < arch_reg_num));
@@ -164,6 +165,7 @@ namespace component{
                 if(ret){
                     set_visible(old_phy_id,false);
                 }
+                // printf("\033[31mset map: arch_id:%d,phy_id:%d,old_phy_id:%d,visible:%d\033[0m\n",arch_id,phy_id,old_phy_id,get_visible(old_phy_id));
                 // printf("after set map:arch_id:%d\n",phy_map_table[32]);
                 return old_phy_id;
             }
@@ -222,6 +224,68 @@ namespace component{
                         }
                     }
                 }
+            }
+
+            /*以下cp相关函数是为了rename阶段除第一条指令外的分支指令checkpoint使用，由于同一周期rename的指令set_map下一周期才写入rat
+            *因此需要一个旁路将同周期其它指令的映射关系写入cp中
+            */
+            void cp_set_valid(checkpoint_t &cp,uint32_t phy_id,bool v){
+                assert(phy_id < phy_reg_num);
+
+                if(v){
+                    cp.rat_phy_map_table_valid[phy_id / BITSIZE(cp.rat_phy_map_table_valid[0])] |= 1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_valid[0]));
+                }else{
+                    cp.rat_phy_map_table_valid[phy_id / BITSIZE(cp.rat_phy_map_table_valid[0])] &= ~(1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_valid[0])));
+                }
+            }
+            bool cp_get_valid(checkpoint_t &cp,uint32_t phy_id){
+                assert(phy_id < phy_reg_num);
+                return cp.rat_phy_map_table_valid[phy_id / BITSIZE(cp.rat_phy_map_table_valid)] & (1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_valid)));
+            }
+            void cp_set_visible(checkpoint_t &cp,uint32_t phy_id,bool v){
+                assert(phy_id < phy_reg_num);
+
+                if(v){
+                    cp.rat_phy_map_table_visible[phy_id / BITSIZE(cp.rat_phy_map_table_visible[0])] |= 1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_visible[0]));
+                }else{
+                    cp.rat_phy_map_table_visible[phy_id / BITSIZE(cp.rat_phy_map_table_visible[0])] &= ~(1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_visible[0])));
+                }
+            }
+            bool cp_get_visible(checkpoint_t &cp,uint32_t phy_id){
+                assert(phy_id < phy_reg_num);
+                return cp.rat_phy_map_table_visible[phy_id / BITSIZE(cp.rat_phy_map_table_visible[0])] & (1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_visible[0])));
+            }
+            bool cp_get_phy_id(checkpoint_t &cp,uint32_t arch_id,uint32_t *phy_id){
+                int cnt = 0;
+                assert((arch_id > 0) && (arch_id < arch_reg_num));
+
+                for(uint32_t i = 0;i < phy_reg_num;i++){
+                    if(cp_get_valid(cp,i) && cp_get_visible(cp,i) && (cp.rat_phy_map_table[i] == arch_id)){
+                        *phy_id = i;
+                        cnt++;
+                    }
+                }
+                assert(cnt <= 1);
+                return cnt == 1;
+            }
+            void cp_set_map(checkpoint_t &cp,uint32_t arch_id,uint32_t phy_id){
+                uint32_t old_phy_id;
+                assert(phy_id < phy_reg_num);
+                assert((arch_id > 0) && (arch_id < arch_reg_num));
+                assert(!cp_get_valid(cp,phy_id));
+                bool ret = cp_get_phy_id(cp,arch_id,&old_phy_id);
+                cp.rat_phy_map_table[phy_id] = arch_id;
+                cp_set_valid(cp,phy_id,true);
+                cp_set_visible(cp,phy_id,true);
+                if(ret){
+                    cp_set_visible(cp,old_phy_id,false);
+                }
+            }
+            void cp_release_map(checkpoint_t &cp,uint32_t phy_id){
+                assert(phy_id < phy_reg_num);
+                assert(cp_get_valid(cp,phy_id));
+                assert(!cp_get_visible(cp,phy_id));
+                cp_set_valid(cp,phy_id,false);
             }
     };
 }

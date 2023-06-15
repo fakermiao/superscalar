@@ -132,5 +132,20 @@ namespace component{
                     }
                 }
             }
+
+            //为了分支预测失败时的恢复，此时应该只保留真值映射
+            bool cp_get_data_valid(checkpoint_t &cp,uint32_t addr){
+                assert(addr < size);
+                return (cp.phy_regfile_data_valid[addr / BITSIZE(cp.phy_regfile_data_valid[0])] & (1ULL << (addr % BITSIZE(cp.phy_regfile_data_valid[0])))) != 0;
+            }
+
+            void cp_set_data_valid(checkpoint_t &cp,uint32_t addr,bool valid){
+                assert(addr < size);
+                if(valid){
+                    cp.phy_regfile_data_valid[addr / BITSIZE(cp.phy_regfile_data_valid[0])] |= 1ULL << (addr % BITSIZE(cp.phy_regfile_data_valid[0]));
+                }else{
+                    cp.phy_regfile_data_valid[addr / BITSIZE(cp.phy_regfile_data_valid[0])] &= ~(1ULL << (addr % BITSIZE(cp.phy_regfile_data_valid[0])));
+                }
+            }
     };
 }

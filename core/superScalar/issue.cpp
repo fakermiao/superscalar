@@ -5,6 +5,8 @@
  * @LastEditors: 苗金标
  * @LastEditTime: 2023-06-09 20:57:41
  * @Description: 
+ * 0613 fix step1 wb feedback bug,rs2 
+ * 0615 fix lsu bug,lsu严格按顺序执行
  */
 #include "issue.h"
 
@@ -46,8 +48,9 @@ namespace Supercore{
                     mou_unit_used[i] = issue_mou_fifo[i]->is_full();
                 }
                 //遍历发射队列找到可以发射的指令
+                bool has_lsu = false;
                 do{
-                    printf("issue\tid:%d\n",id);
+                    // printf("issue\tid:%d\n",id);
                     instStr cur_inst = issue_q.get_item(id);
                     bool issued = false;
                     bool rs1_ready = false;
@@ -68,7 +71,8 @@ namespace Supercore{
                         cur_inst.rs2_enable = true;
                         cur_inst.rs2_value  = 0;
                     }
-                    //处理反馈，可以不需要
+                    // printf("issue pc:%lx,rs1_ready:%d,rs2_ready:%d\n",cur_inst.pc,rs1_ready,rs2_ready);
+                    //处理反馈，可以不需要,0613 check no problem
                     for(uint32_t i = 0;i < EXECUTE_UNIT_NUM;i++){
                         if(exe_feedback.exe_channel[i].rd_enable){
                             if(!rs1_ready && (cur_inst.rs1_phy == exe_feedback.exe_channel[i].rd_id)){
@@ -90,12 +94,17 @@ namespace Supercore{
                                 cur_inst.rs1_enable = true;
                                 cur_inst.rs1_value  = wb_feedback_pack_t.wb_channel[i].rd_value;
                             }
-                            if(!rs2_ready && (cur_inst.rs1_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
+                            if(!rs2_ready && (cur_inst.rs2_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
                                 rs2_ready = true;
                                 cur_inst.rs2_enable = true;
                                 cur_inst.rs2_value  = wb_feedback_pack_t.wb_channel[i].rd_value;
                             }
                         }
+                    }
+                    if(cur_inst.fuType == FuType::lsu){
+                        if(has_lsu)
+                            continue;
+                        has_lsu = true;
                     }
                     if(rs1_ready && rs2_ready){
                         uint32_t unit_num = 0;
@@ -152,7 +161,7 @@ namespace Supercore{
                         }
                     }
                 }while(issue_q.get_next_id(id,&id) && (id != first_id) && (issued_list.size() < ISSUE_WIDTH));
-                this->issue_q.compress_sync(issued_list);
+                // this->issue_q.compress(issued_list);//compress要如果sync会出现下面set_item_sync使用旧id,compress后set_item使用新id的不对等情况
             }
 
             //step2.接收exectue、wb执行返回唤醒issue_q队列的指令
@@ -162,6 +171,7 @@ namespace Supercore{
                 auto modified = false;
                 do{
                     auto cur_inst = issue_q.get_item(cur_id);
+                    // printf("pc:%lx,rs1_phy:%d,rs2_phy:%d\n",cur_inst.pc,cur_inst.rs1_phy,cur_inst.rs2_phy);
                     for(uint32_t i = 0;i < EXECUTE_UNIT_NUM;i++){
                         if(exe_feedback.exe_channel[i].rd_enable){
                             if(cur_inst.rs1_valid && !cur_inst.rs1_enable && (cur_inst.rs1_phy == exe_feedback.exe_channel[i].rd_id)){
@@ -176,12 +186,13 @@ namespace Supercore{
                             }
                         }
                         if(wb_feedback_pack_t.wb_channel[i].rd_enable){
-                            if(cur_inst.rs1_valid && cur_inst.rs1_enable && (cur_inst.rs1_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
+                            // printf("wb feedback:%d\n",wb_feedback_pack_t.wb_channel[i].rd_id);
+                            if(cur_inst.rs1_valid && !cur_inst.rs1_enable && (cur_inst.rs1_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
                                 cur_inst.rs1_enable = true;
                                 cur_inst.rs1_value = wb_feedback_pack_t.wb_channel[i].rd_value;
                                 modified = true;
                             }
-                            if(cur_inst.rs2_valid && cur_inst.rs2_enable && (cur_inst.rs2_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
+                            if(cur_inst.rs2_valid && !cur_inst.rs2_enable && (cur_inst.rs2_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
                                 cur_inst.rs2_enable = true;
                                 cur_inst.rs2_value = wb_feedback_pack_t.wb_channel[i].rd_value;
                                 modified = true;
@@ -253,15 +264,17 @@ namespace Supercore{
                                 }
                                 if(rev_pack.rename_issue[i].rs2_valid && !rev_pack.rename_issue[i].rs2_enable &&
                                 (rev_pack.rename_issue[i].rs2_phy == wb_feedback_pack_t.wb_channel[j].rd_id)){
-                                    rev_pack.rename_issue[i].rs1_enable = true;
+                                    rev_pack.rename_issue[i].rs2_enable = true;
                                     rev_pack.rename_issue[i].rs2_value  = wb_feedback_pack_t.wb_channel[j].rd_value;
                                 }
                             }
                         }
+                        // printf("issue push\tpc:%lx,rs1_enable:%d,rs2_enable:%d\n",rev_pack.rename_issue[i].pc,rev_pack.rename_issue[i].rs1_enable,rev_pack.rename_issue[i].rs2_enable);
                         issue_q.push(rev_pack.rename_issue[i]);
                     }
                 }
             }
+            this->issue_q.compress_sync(issued_list);
         }else{
 
             for(int i = 0;i < 32;i++){

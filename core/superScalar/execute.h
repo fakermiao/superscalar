@@ -12,6 +12,6 @@ namespace Supercore{
     typedef struct execute_channel{
         bool     rd_enable;
         uint32_t rd_id;
-        uint32_t rd_value;
+        uint64_t rd_value;
     }execute_channel;
 }

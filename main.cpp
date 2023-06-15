@@ -44,7 +44,10 @@ CPU_state cpu;
 
 component::memory mem(0,0x80000000);
 // const char *load_path = "test/rv64mi/rv64mi-p-illegal.bin";
-const char *load_path = "test/rv64ui/rv64ui-p-add.bin";
+//step1. test phy address,ma_data、simple do not test
+//0615: fix lsu bugs, all I test execpt ma_data、simple
+//step2. test virtual address
+const char *load_path = "test/rv64um/rv64um-p-div.bin";
 // const char *load_path = "test/rv64um/rv64um-v-div.bin";
 // const char *load_path = "test/rv64ua/rv64ua-v-lrsc.bin";
 // const char *load_path = "test/fw_payload.bin";
@@ -198,7 +201,6 @@ void exec_once(){
     rename_stage.evaluate(wb_feedback);
     decode_stage.evaluate(wb_feedback);
     fetch_stage.evaluate(bru_feedback,wb_feedback);
-
 
     rat.sync();
     storeBuffer.sync();

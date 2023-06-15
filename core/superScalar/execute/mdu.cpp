@@ -19,6 +19,7 @@ namespace Supercore{
                 if(instInfo.valid){
                     int64_t src1 = instInfo.rs1_value;
                     int64_t src2 = instInfo.rs2_valid ? instInfo.rs2_value : instInfo.imm;
+                    printf("src1:%lx,src2:%lx\n",src1,src2);
                     int64_t mdu_result;
                     switch(instInfo.fuOpType.mduOp){
                         case MDUOpType::mul:{
@@ -43,7 +44,7 @@ namespace Supercore{
                         }
                         case MDUOpType::div:{
                             if(src2 == 0) mdu_result = -1;
-                            else if(src1 == LONG_MIN && src1 == -1) mdu_result = LONG_MIN;
+                            else if(src1 == LONG_MIN && src2 == -1) mdu_result = LONG_MIN;
                             else mdu_result = src1 / src2;
                             break; 
                         }
