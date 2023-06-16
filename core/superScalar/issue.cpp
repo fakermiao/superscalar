@@ -106,6 +106,11 @@ namespace Supercore{
                             continue;
                         has_lsu = true;
                     }
+                    if((cur_inst.fuType == FuType::mou) || (cur_inst.fuType == FuType::csr)){
+                        if(wb_feedback_pack_t.rob_enable && (cur_inst.rob_id != wb_feedback_pack_t.rob_next)){
+                            continue;
+                        }
+                    }
                     if(rs1_ready && rs2_ready){
                         uint32_t unit_num = 0;
                         component::fifo<instStr> **unit_fifo = NULL;

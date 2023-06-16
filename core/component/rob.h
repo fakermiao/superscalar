@@ -21,7 +21,7 @@ namespace component{
 
         bool        rd_valid;
         uint32_t    rd_id;
-        int64_t    rd_value;
+        int64_t     rd_value;
 
         bool        has_execp;
         rv_exc_code execp_id;

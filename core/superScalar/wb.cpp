@@ -154,7 +154,6 @@ namespace Supercore{
                         if(rob_item.has_execp){
                             if(rob_item.execp_id == exc_breakpoint){
                                 csr_cause_def cause(exc_breakpoint);
-                                // printf("wb 157\n");
                                 priv.raise_trap(rob_item.pc,cause);
                             }else if(rob_item.execp_id == exc_ecall_from_u){
                                 uint32_t phy_17 = 0,phy_10 = 0;
@@ -186,61 +185,15 @@ namespace Supercore{
                                 }
                             }else if(rob_item.execp_id == exc_instr_misalign){
                                 csr_cause_def cause(rob_item.execp_id);
-                                // printf("wb 189\n");
                                 priv.raise_trap(rob_item.pc,cause,rob_item.execp_value);
                             }else if(rob_item.execp_id == exc_illegal_instr){
                                 csr_cause_def cause(rob_item.execp_id);
-                                // printf("wb 193\n");
                                 priv.raise_trap(rob_item.pc,cause,rob_item.inst);
                             }else{
                                 csr_cause_def cause(rob_item.execp_id);
-                                // printf("wb 197,pc:%lx,inst:%x\n",rob_item.pc,rob_item.inst);
                                 priv.raise_trap(rob_item.pc,cause,rob_item.execp_value);
                             }
                         }
-                        // if(rob_item.fu_type == FuType::csr){
-                        //     bool success = false;
-                        //     switch(rob_item.fuOpType.csrOp){
-                        //         case CSROpType::sret:{
-                        //             success = priv.sret();
-                        //             break;
-                        //         }
-                        //         case CSROpType::mret:{
-                        //             success = priv.mret();
-                        //             break;
-                        //         }
-                        //         default:
-                        //             break;
-                        //     }
-                        //     if(!success){
-                        //         csr_cause_def cause(rob_item.execp_id);
-                        //         priv.raise_trap(rob_item.pc,cause,rob_item.inst);
-                        //     }
-                        // }
-                        // // case MOUOpType::fencei:{
-                        // //     // priv.fence_i();
-                        // //     break;
-                        // // }
-                        // // case MOUOpType::sfence_vma:{
-                        // //     // if(!priv.sfence_vma(instInfo.rs1_value,instInfo.rs2_value & 0xffff)){
-                        // //     //     instInfo.has_execp = true;
-                        // //     //     instInfo.execp_id = exc_illegal_instr;
-                        // //     // }
-                        // //     break;
-                        // // }
-                        // if(rob_item.fu_type == FuType::mou){
-                        //     switch(rob_item.fuOpType.mouOp){
-                        //         case MOUOpType::fencei:{
-                        //             priv.fence_i();
-                        //             break;
-                        //         }
-                        //         case MOUOpType::sfence_vma:{
-                        //             break;
-                        //         }
-                        //         default:
-                        //             break;
-                        //     }
-                        // }
 
                         if(rob_item.rd_valid){
                             feed_pack.wb_channel[commit_num].rd_enable = true;
@@ -360,6 +313,7 @@ namespace Supercore{
                     }else{
                         csr_cause_def cause(rob_item.execp_id);
                         uint64_t tval = (rob_item.execp_id == exc_illegal_instr) ? (rob_item.inst) : (rob_item.pc);
+                        printf("invalid pc:%lx,inst:%x\n",rob_item.pc,rob_item.inst);
                         priv.raise_trap(rob_item.pc,cause,tval);
                         feed_pack.flush = true;
                         feed_pack.enable = true;
@@ -374,6 +328,7 @@ namespace Supercore{
                     break;
                 }
             }
+            feed_pack.rob_enable = rob->get_front_id(&feed_pack.rob_next);
         }
         return feed_pack;
     }

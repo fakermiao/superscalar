@@ -44,6 +44,8 @@ typedef struct wb_feedback_pack{
     bool     rd_enable;
     uint32_t rd_id;
     int64_t  rd_value;
+    bool     rob_enable;
+    uint32_t rob_next;
     channel  wb_channel[EXECUTE_UNIT_NUM];
 }wb_feedback_pack;
 
