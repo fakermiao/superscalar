@@ -299,12 +299,12 @@ class Priv{
                     csr_result = 0;
                     break;
                 /*pmpaddr、pmpcfg寄存器的实现是可选的，完成riscv-tests测试后可删除*/
-                // case csr_pmpaddr0:
-                //     csr_result = pmpaddr0;
-                //     break;
-                // case csr_pmpcfg0:
-                //     csr_result = pmpcfg0;
-                //     break;
+                case csr_pmpaddr0:
+                    csr_result = pmpaddr0;
+                    break;
+                case csr_pmpcfg0:
+                    csr_result = pmpcfg0;
+                    break;
                 default:
                     return false;
             }

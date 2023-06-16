@@ -47,13 +47,13 @@ namespace Supercore{
                 phy_regfile->set_valid_sync(item.OPreg,true);
             }
         }while((tail_id != head_id) && (rob->get_prev_id(tail_id,&tail_id)));
-        printf("interrupt handler\n");
         rob->flush();
         cp->flush();
         store_buffer->flush();
     } 
 
     void wb::execption_handler(){
+        // assert(0);
         uint32_t tail_id;
         uint32_t head_id;
         assert(rob->get_front_id(&head_id));
@@ -67,7 +67,6 @@ namespace Supercore{
                 phy_regfile->set_valid_sync(item.OPreg,true);
             }
         }while((tail_id != head_id) && (rob->get_prev_id(tail_id,&tail_id)));
-        printf("execption handler\n");
         rob->flush();
         cp->flush();
         store_buffer->flush();
@@ -109,6 +108,7 @@ namespace Supercore{
                 instStr instInfo;
                 lsu_wb_fifo[i]->pop(&instInfo);
                 auto rob_item_t = rob->get_item(instInfo.rob_id);
+                // printf("pc:%lx,value:%lx\n",instInfo.pc,instInfo.rd_value);
                 this->set_rob_item(rob_item_t,instInfo);
                 rob->set_item(instInfo.rob_id,rob_item_t);
             }
@@ -154,6 +154,7 @@ namespace Supercore{
                         if(rob_item.has_execp){
                             if(rob_item.execp_id == exc_breakpoint){
                                 csr_cause_def cause(exc_breakpoint);
+                                // printf("wb 157\n");
                                 priv.raise_trap(rob_item.pc,cause);
                             }else if(rob_item.execp_id == exc_ecall_from_u){
                                 uint32_t phy_17 = 0,phy_10 = 0;
@@ -185,21 +186,68 @@ namespace Supercore{
                                 }
                             }else if(rob_item.execp_id == exc_instr_misalign){
                                 csr_cause_def cause(rob_item.execp_id);
+                                // printf("wb 189\n");
                                 priv.raise_trap(rob_item.pc,cause,rob_item.execp_value);
                             }else if(rob_item.execp_id == exc_illegal_instr){
                                 csr_cause_def cause(rob_item.execp_id);
+                                // printf("wb 193\n");
                                 priv.raise_trap(rob_item.pc,cause,rob_item.inst);
                             }else{
                                 csr_cause_def cause(rob_item.execp_id);
+                                // printf("wb 197,pc:%lx,inst:%x\n",rob_item.pc,rob_item.inst);
                                 priv.raise_trap(rob_item.pc,cause,rob_item.execp_value);
                             }
                         }
+                        // if(rob_item.fu_type == FuType::csr){
+                        //     bool success = false;
+                        //     switch(rob_item.fuOpType.csrOp){
+                        //         case CSROpType::sret:{
+                        //             success = priv.sret();
+                        //             break;
+                        //         }
+                        //         case CSROpType::mret:{
+                        //             success = priv.mret();
+                        //             break;
+                        //         }
+                        //         default:
+                        //             break;
+                        //     }
+                        //     if(!success){
+                        //         csr_cause_def cause(rob_item.execp_id);
+                        //         priv.raise_trap(rob_item.pc,cause,rob_item.inst);
+                        //     }
+                        // }
+                        // // case MOUOpType::fencei:{
+                        // //     // priv.fence_i();
+                        // //     break;
+                        // // }
+                        // // case MOUOpType::sfence_vma:{
+                        // //     // if(!priv.sfence_vma(instInfo.rs1_value,instInfo.rs2_value & 0xffff)){
+                        // //     //     instInfo.has_execp = true;
+                        // //     //     instInfo.execp_id = exc_illegal_instr;
+                        // //     // }
+                        // //     break;
+                        // // }
+                        // if(rob_item.fu_type == FuType::mou){
+                        //     switch(rob_item.fuOpType.mouOp){
+                        //         case MOUOpType::fencei:{
+                        //             priv.fence_i();
+                        //             break;
+                        //         }
+                        //         case MOUOpType::sfence_vma:{
+                        //             break;
+                        //         }
+                        //         default:
+                        //             break;
+                        //     }
+                        // }
+
                         if(rob_item.rd_valid){
                             feed_pack.wb_channel[commit_num].rd_enable = true;
                             feed_pack.wb_channel[commit_num].rd_id     = rob_item.rd_id;
                             feed_pack.wb_channel[commit_num].rd_value  = rob_item.rd_value;
                             phy_regfile->write_sync(rob_item.Preg,rob_item.rd_value,true);
-                            
+                            // printf("pc:%lx,rob_value:%lx\n",rob_item.pc,rob_item.rd_value);
                             {
                                 //for riscv test
                                 if(!rat->get_phy_id(10,&arch10_feedback))
@@ -242,8 +290,9 @@ namespace Supercore{
                                         store_buffer->print();
                                         store_buffer->pop(&store_item);
                                         assert(store_item.enable);
-                                        // printf("write pc:%lx,addr:%lx,value:%ld\n",store_item.pc,store_item.addr,store_item.data);
-                                        priv.va_write(store_item.addr,store_item.size,(unsigned char*)&store_item.data);
+                                        // printf("write pc:%lx,addr:%lx,value:%lx\n",store_item.pc,store_item.addr,store_item.data);
+                                        if(store_item.size)
+                                            priv.va_write(store_item.addr,store_item.size,(unsigned char*)&store_item.data);
                                         break;
                                     }
                                     default:

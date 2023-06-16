@@ -224,15 +224,24 @@ namespace Supercore{
                             if(store_buffer->is_full()){
                                 store_buffer_full = true;
                             }else{
-                                component::store_buffer_item item;
-                                item.enable = true;
-                                item.addr   = instInfo.rs1_value;
-                                item.size   = 8;
-                                item.data   = instInfo.rs2_value;
-                                item.committed = false;
-                                item.pc     = instInfo.pc;
-                                item.rob_id = instInfo.rob_id;
-                                store_buffer->push_sync(item);
+                                bool sc_result;
+                                rv_exc_code exc = priv.super_va_sc(instInfo.rs1_value,8,(uint8_t*)&instInfo.rs2_value,sc_result);
+                                if(exc == exc_custom_ok){
+                                    component::store_buffer_item item;
+                                    item.enable = true;
+                                    item.addr   = instInfo.rs1_value;
+                                    item.size   = sc_result ? 0 : 8;
+                                    item.data   = instInfo.rs2_value;
+                                    item.committed = false;
+                                    item.pc     = instInfo.pc;
+                                    item.rob_id = instInfo.rob_id;
+                                    store_buffer->push_sync(item);
+                                    instInfo.rd_enable = true;
+                                    instInfo.rd_value = sc_result;
+                                }else{
+                                    instInfo.has_execp = true;
+                                    instInfo.execp_id = exc;
+                                }
                             }
                             break;
                         }
@@ -240,35 +249,49 @@ namespace Supercore{
                             if(store_buffer->is_full()){
                                 store_buffer_full = true;
                             }else{
-                                component::store_buffer_item item;
-                                item.enable = true;
-                                item.addr   = instInfo.rs1_value;
-                                item.size   = 4;
-                                item.data   = instInfo.rs2_value & DATAWORD;
-                                item.committed = false;
-                                item.pc     = instInfo.pc;
-                                item.rob_id = instInfo.rob_id;
-                                store_buffer->push_sync(item);
+                                bool sc_result;
+                                rv_exc_code exc = priv.super_va_sc(instInfo.rs1_value,4,(uint8_t*)&instInfo.rs2_value,sc_result);
+                                if(exc == exc_custom_ok){
+                                    component::store_buffer_item item;
+                                    item.enable = true;
+                                    item.addr   = instInfo.rs1_value;
+                                    item.size   = sc_result ? 0 : 4;
+                                    item.data   = instInfo.rs2_value & DATAWORD;
+                                    item.committed = false;
+                                    item.pc     = instInfo.pc;
+                                    item.rob_id = instInfo.rob_id;
+                                    store_buffer->push_sync(item);
+                                    instInfo.rd_enable = true;
+                                    instInfo.rd_value  = sc_result;
+                                }else{
+                                    instInfo.has_execp = true;
+                                    instInfo.execp_id  = exc;
+                                }
                             }
                             break;
                         }
                         case LSUOpType::amoswap: case LSUOpType::amoadd: case LSUOpType::amoxor: case LSUOpType::amoand: case LSUOpType::amoor:
                         case LSUOpType::amomin:  case LSUOpType::amomax: case LSUOpType::amominu: case LSUOpType::amomaxu:{
                             int64_t amo_result;
-                            rv_exc_code execp_id = priv.super_va_amo(instInfo.rs1_value,8,instInfo.fuOpType.lsuOp,instInfo.rs2_value,amo_result);
+                            int64_t store_result;
+                            rv_exc_code execp_id = priv.super_va_amo(instInfo.rs1_value,8,instInfo.fuOpType.lsuOp,instInfo.rs2_value,amo_result,store_result);
+                            // printf("hello lsu amoadd_d\n");
                             if(execp_id == exc_custom_ok){
                                 component::store_buffer_item item;
                                 item.enable = true;
                                 item.addr   = instInfo.rs1_value;
                                 item.size   = 8;
-                                item.data   = amo_result;
+                                item.data   = store_result;
                                 item.committed = false;
                                 item.pc     = instInfo.pc;
                                 item.rob_id = instInfo.rob_id;
                                 if(store_buffer->is_full())
                                     store_buffer_full = true;
-                                else     
+                                else{     
                                     store_buffer->push_sync(item);
+                                    instInfo.rd_enable = true;
+                                    instInfo.rd_value  = amo_result;
+                                }
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = execp_id;
@@ -278,20 +301,24 @@ namespace Supercore{
                         case LSUOpType::amoswapw: case LSUOpType::amoaddw: case LSUOpType::amoxorw: case LSUOpType::amoandw: case LSUOpType::amoorw:
                         case LSUOpType::amominw:  case LSUOpType::amomaxw: case LSUOpType::amominuw: case LSUOpType::amomaxuw:{
                             int64_t amo_result;
-                            rv_exc_code execp_id = priv.super_va_amo(instInfo.rs1_value,4,instInfo.fuOpType.lsuOp,instInfo.rs2_value,amo_result);
+                            int64_t store_result;
+                            rv_exc_code execp_id = priv.super_va_amo(instInfo.rs1_value,4,instInfo.fuOpType.lsuOp,instInfo.rs2_value,amo_result,store_result);
                             if(execp_id == exc_custom_ok){
                                 component::store_buffer_item item;
                                 item.enable = true;
                                 item.addr   = instInfo.rs1_value;
                                 item.size   = 4;
-                                item.data   = amo_result;
+                                item.data   = store_result;
                                 item.committed = false;
                                 item.pc     = instInfo.pc;
                                 item.rob_id = instInfo.rob_id;
                                 if(store_buffer->is_full())
                                     store_buffer_full = true;
-                                else
+                                else{
                                     store_buffer->push_sync(item);
+                                    instInfo.rd_enable = true;
+                                    instInfo.rd_value  = sign_extend(amo_result,32);
+                                }
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = execp_id;
@@ -306,6 +333,7 @@ namespace Supercore{
                     this->lsu_p(instInfo);
                 }
                 if(!store_buffer_full){
+                    // printf("pc:%lx,data:%lx\n",instInfo.pc,instInfo.rd_value);
                     lsu_wb_fifo->push(instInfo);
                     issue_lsu_fifo->pop(&instInfo);
                 }

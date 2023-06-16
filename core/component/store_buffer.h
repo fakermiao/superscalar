@@ -73,7 +73,7 @@ namespace component{
             uint64_t get_value(uint64_t addr,uint64_t size,uint64_t mem_value){
                 uint64_t result = mem_value;
                 uint32_t cur_id;
-                this->print();
+                // this->print();
                 if(get_front_id(&cur_id)){
                     auto first_id = cur_id;
                     do{

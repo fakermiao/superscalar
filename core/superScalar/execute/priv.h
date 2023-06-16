@@ -299,12 +299,12 @@ class Priv{
                     csr_result = 0;
                     break;
                 /*pmpaddr、pmpcfg寄存器的实现是可选的，完成riscv-tests测试后可删除*/
-                // case csr_pmpaddr0:
-                //     csr_result = pmpaddr0;
-                //     break;
-                // case csr_pmpcfg0:
-                //     csr_result = pmpcfg0;
-                //     break;
+                case csr_pmpaddr0:
+                    csr_result = pmpaddr0;
+                    break;
+                case csr_pmpcfg0:
+                    csr_result = pmpcfg0;
+                    break;
                 default:
                     return false;
             }
@@ -621,12 +621,12 @@ class Priv{
             }
         }
 
-        rv_exc_code super_va_amo(uint64_t start_addr,uint64_t size,LSUOpType op,int64_t src,int64_t &dst){
+        rv_exc_code super_va_amo(uint64_t start_addr,uint64_t size,LSUOpType op,int64_t src,int64_t &dst,int64_t &to_write){
             assert(size == 4 || size == 8);
             const satp_def *satp_reg = (satp_def *)&satp;
             const csr_mstatus_def *mstatus = (csr_mstatus_def*)&status;
             if((cur_priv == M_MODE && (!mstatus->mprv || mstatus->mpp == M_MODE)) || satp_reg->mode == 0){
-                bool pstatus = l1d.super_pa_amo_op(start_addr,size,op,src,dst);
+                bool pstatus = l1d.super_pa_amo_op(start_addr,size,op,src,dst,to_write);
                 if(!pstatus) return exc_store_acc_fault;
                 else return exc_custom_ok;
             }else{
@@ -637,7 +637,29 @@ class Priv{
                 if(priv == U_MODE && !tlb_e->U) return exc_store_pgfault;
                 if(!mstatus->sum && priv == S_MODE && tlb_e->U) return exc_store_pgfault;
                 uint64_t pa = tlb_e->ppa + (start_addr % ((tlb_e->pagesize == 1)?(1<<12):((tlb_e->pagesize==2)?(1<<21):(1<<30))));
-                bool pstatus = l1d.super_pa_amo_op(pa,size,op,src,dst);
+                bool pstatus = l1d.super_pa_amo_op(pa,size,op,src,dst,to_write);
+                if(!pstatus) return exc_store_pgfault;
+                else return exc_custom_ok;
+            }
+        }
+
+        rv_exc_code super_va_sc(uint64_t start_addr,uint64_t size,const uint8_t *buffer,bool &sc_fail){
+            assert(size == 4 || size == 8);
+            const satp_def *satp_reg = (satp_def *)&satp;
+            const csr_mstatus_def *mstatus = (csr_mstatus_def*)&status;
+            if((cur_priv == M_MODE && (!mstatus->mprv || mstatus->mpp == M_MODE)) || satp_reg->mode == 0){
+                bool pstatus = l1d.super_pa_sc(start_addr,size,buffer,sc_fail);
+                if(!pstatus) return exc_store_acc_fault;
+                else return exc_custom_ok;
+            }else{
+                if((start_addr >> 12) != ((start_addr + size - 1) >> 12)) return exc_store_misalign;
+                sv39_tlb_entry *tlb_e = d_tlb.local_tlbe_get(*satp_reg,start_addr);
+                if(!tlb_e || !tlb_e->A || !tlb_e->D || !tlb_e->W) return exc_store_pgfault;
+                priv_mode priv = (mstatus->mprv && cur_priv == M_MODE) ? static_cast<priv_mode>(mstatus->mpp) : cur_priv;
+                if(priv == U_MODE && !tlb_e->U) return exc_store_pgfault;
+                if(!mstatus->sum && priv == S_MODE && tlb_e->U) return exc_store_pgfault;
+                uint64_t pa = tlb_e->ppa + (start_addr % ((tlb_e->pagesize == 1)?(1<<12):((tlb_e->pagesize==2)?(1<<21):(1<<30))));
+                bool pstatus = l1d.super_pa_sc(pa,size,buffer,sc_fail);
                 if(!pstatus) return exc_store_pgfault;
                 else return exc_custom_ok;
             }
@@ -647,6 +669,7 @@ class Priv{
             csr_cause_def cause;
             cause.cause = cur_priv + 8;
             cause.interrupt = 0;
+            printf("ecall\n");
             raise_trap(cur_pc,cause);
         }
         void ebreak(){
