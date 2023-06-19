@@ -58,7 +58,7 @@ namespace Supercore{
                             if(exp_id == exc_custom_ok){
                                 lsu_value = store_buffer->get_value(lsu_addr,4,buf);
                                 instInfo.rd_enable = true;
-                                printf("lw store addr:%lx, data:%lx\n",lsu_addr,lsu_value);
+                                // printf("lw store addr:%lx, data:%lx\n",lsu_addr,lsu_value);
                                 instInfo.rd_value  = sign_extend(lsu_value,32);
                             }else{
                                 instInfo.has_execp = true;

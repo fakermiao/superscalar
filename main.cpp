@@ -48,7 +48,7 @@ component::memory mem(0,0x80000000);
 //0615: fix lsu bugs, all I instructions test execpt ma_data、simple，all M instructions test
 //0616: 修改原子指令逻辑，成功跑通所有原子指令，之前原子指令逻辑错误，没有写回寄存器的值
 //step2. test virtual address
-const char *load_path = "test/rv64ui/rv64ui-p-add.bin";
+const char *load_path = "test/rv64ui/rv64ui-v-add.bin";
 // const char *load_path = "test/rv64um/rv64um-v-div.bin";
 // const char *load_path = "test/rv64ua/rv64ua-v-lrsc.bin";
 // const char *load_path = "test/fw_payload.bin";

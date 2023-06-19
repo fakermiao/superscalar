@@ -225,6 +225,8 @@ namespace Supercore{
                             feed_pack.flush = true;
                             feed_pack.enable = true;
                             feed_pack.next_pc = priv.get_trap_pc();
+                            priv.post_exc();
+                            break;
                         }
                         if(!rob_item.has_execp){
                             if(rob_item.fu_type == FuType::lsu){
@@ -240,7 +242,7 @@ namespace Supercore{
                                     case LSUOpType::amominw: case LSUOpType::amomaxw: case LSUOpType::amominuw: case LSUOpType::amomaxuw:{
                                         component::store_buffer_item store_item;
                                         // memset(&store_item,0,sizeof(store_item));
-                                        store_buffer->print();
+                                        // store_buffer->print();
                                         store_buffer->pop(&store_item);
                                         assert(store_item.enable);
                                         // printf("write pc:%lx,addr:%lx,value:%lx\n",store_item.pc,store_item.addr,store_item.data);
@@ -305,6 +307,7 @@ namespace Supercore{
                             }else if((rob_item.fu_type == FuType::csr) || (rob_item.fu_type == FuType::mou)){
                                 feed_pack.flush = true;
                                 feed_pack.enable = true;
+                                // printf("hello csr\n");
                                 feed_pack.next_pc = rob_item.pc + 4;
                             }
                         }
@@ -318,6 +321,7 @@ namespace Supercore{
                         feed_pack.flush = true;
                         feed_pack.enable = true;
                         feed_pack.next_pc = priv.get_trap_pc();
+                        this->execption_handler();
                         priv.post_exc();
                     }
                     this->wb_p(commit_num,rob_item);
