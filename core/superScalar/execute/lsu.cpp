@@ -60,7 +60,6 @@ namespace Supercore{
                             if(exp_id == exc_custom_ok){
                                 lsu_value = store_buffer->get_value(lsu_addr,4,buf);
                                 instInfo.rd_enable = true;
-                                // printf("lw store addr:%lx, data:%lx\n",lsu_addr,lsu_value);
                                 instInfo.rd_value  = sign_extend(lsu_value,32);
                             }else{
                                 instInfo.has_execp = true;
@@ -73,7 +72,6 @@ namespace Supercore{
                             int64_t buf;
                             rv_exc_code exp_id = mem_read(lsu_addr,8,(unsigned char*)&buf);
                             if(exp_id == exc_custom_ok){
-                                printf("ld pc:%lx,inst:%x,addr:%lx\n",instInfo.pc,instInfo.inst,lsu_addr);
                                 lsu_value = store_buffer->get_value(lsu_addr,8,buf);
                                 instInfo.rd_enable = true;
                                 instInfo.rd_value = lsu_value;
@@ -155,7 +153,6 @@ namespace Supercore{
                                 item.pc     = instInfo.pc;
                                 item.rob_id = instInfo.rob_id;
                                 store_buffer->push_sync(item);
-                                // printf("store pc:%lx,addr:%lx,data:%lx\n",item.pc,item.addr,item.data);
                             }
                             break;
                         }
@@ -172,7 +169,6 @@ namespace Supercore{
                                 item.pc     = instInfo.pc;
                                 item.rob_id = instInfo.rob_id;
                                 store_buffer->push_sync(item);
-                                printf("store pc:%lx,addr:%lx,data:%lx\n",item.pc,item.addr,item.data);
                             }
                             break;
                         }
@@ -342,7 +338,6 @@ namespace Supercore{
                     this->lsu_p(instInfo);
                 }
                 if(!store_buffer_full){
-                    // printf("pc:%lx,data:%lx\n",instInfo.pc,instInfo.rd_value);
                     lsu_wb_fifo->push(instInfo);
                     issue_lsu_fifo->pop(&instInfo);
                 }
