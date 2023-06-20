@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-05-26 10:39:10
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-05-05 16:47:55
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-23 16:05:21
- * @Description: 
- */
 #pragma once
 #include "../memory/memory.h"
 #include <cstdint>

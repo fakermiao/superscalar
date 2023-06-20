@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-04-17 14:58:39
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-02-24 17:31:08
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-03-24 14:19:03
- * @Description: 
- */
 
 #ifndef MEMORY_H
 #define MEMORY_H

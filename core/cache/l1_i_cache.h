@@ -10,7 +10,6 @@
 #include <bitset>
 #include "replacement/tree_plru.h"
 #include "l2_cache.h"
-// #include "clock_manager.h"
 #include "../config.h"
 
 template <int nr_ways = L1I_WAYS, int sz_cache_line = L1I_SZLINE, int nr_sets = L1I_NR_SETS>
@@ -31,8 +30,6 @@ struct l1_i_cache_set {
     }
 };
 
-// extern clock_manager <32> cm;
-
 template <int nr_ways = L1I_WAYS, int sz_cache_line = L1I_SZLINE, int nr_sets = L1I_NR_SETS>
 class l1_i_cache {
     static_assert(__builtin_popcount(nr_ways) == 1);
@@ -49,7 +46,6 @@ public:
         }
     }
     bool pa_if(uint64_t start_addr,uint64_t size,uint8_t *buffer){
-        //for C extension,2 bytes buffer should be added to core to prevent request cross cacheline.
         if(!l1_include(start_addr)) return false;
         l1_i_cache_set <nr_ways,sz_cache_line,nr_sets> *select_set = &set_data[get_index(start_addr)];
         int way_id;
@@ -67,17 +63,14 @@ private:
             way_id = select_set->replace.get_replace();
             select_set->valid.reset(way_id);
             uint64_t req_addr = addr - (addr % sz_cache_line);
-            // cm.sync_with_l2(cm.pipe_if[hart_id]);
             if (addr < 0x80000000) { // for MMIO region, we also cached instruction to speedup.
                 for (int i=0;i<(sz_cache_line/8);i++) {
                     bool res = l2->pa_read_uncached(req_addr + (i * 8), 8, &(select_set->data[way_id][i * 8]));
-                    // cm.sync_with_l2(cm.pipe_if[hart_id]);
                     if (!res) return false;
                 }
             }
             else {
                 bool res = l2->pa_read_cached(req_addr, sz_cache_line, select_set->data[way_id]);
-                // cm.sync_with_l2(cm.pipe_if[hart_id]);
                 if (!res) return false;
             }
             select_set->tag[way_id] = get_tag(addr);

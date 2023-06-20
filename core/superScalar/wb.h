@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-06-09 15:49:27
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-04-03 18:58:37
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-24 14:51:58
- * @Description: 
- */
 #pragma once
 #include "../common.h"
 #include "../component/fifo.h"
@@ -88,7 +81,6 @@ typedef struct wb_feedback_pack{
             void wb_p(uint32_t num,component::rob_item& item){
                 printf("%sWB%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,item.pc,item.inst);
                 printf("\t\trd:%d,rd_value:%lx\n",item.Preg,item.rd_value);
-                // printf("\t\tpredicted:%d,pred_jump:%d,pred_pc:%lx\n",instInfo.predicted,instInfo.predicted_jump,instInfo.predicted_next_pc);
             }
     };
 }

@@ -211,11 +211,7 @@ class branch_predictor : public baseBp{
             auto op_data= inst;
             auto opcode = op_data & 0x7f;
             auto rd     = (op_data >> 7) & 0x1f;
-            // auto funct3 = (op_data >> 12) & 0x07;
             auto rs1    = (op_data >> 15) & 0x1f;
-            // auto rs2    = (op_data >> 20) & 0x1f;
-            // auto funct7 = (op_data >> 25) & 0x7f;
-            //imm_b、imm_j
             auto imm_b  = (((op_data >> 8) & 0x0f) << 1) | (((op_data >> 25) & 0x3f) << 5) | (((op_data >> 7) & 0x01) << 11) |
                             (((op_data >> 31) & 0x01) << 12);
             auto imm_j  = (((op_data >> 12) & 0xff) << 12) | (((op_data >> 20) & 0x1) << 11) | (((op_data >> 21) & 0x3ff) << 1) |

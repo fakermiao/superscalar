@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-06-09 20:56:58
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-04-03 21:01:51
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-24 17:18:42
- * @Description: 
- */
 #include "decode.h"
 
 namespace Supercore{

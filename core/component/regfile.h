@@ -42,7 +42,6 @@ namespace component{
             regfile(uint32_t size) : size(size){
                 reg_data = new T[size];
                 bitmap_size = (size + (sizeof(reg_data_valid[0]) * 8) - 1) / (sizeof(reg_data_valid[0]) - 1);
-                                // phy_map_table_valid = new uint32_t[bitmap_size];
                 reg_data_valid = new uint64_t[bitmap_size];
             }
             void reset(){
@@ -83,7 +82,6 @@ namespace component{
 
             bool read_data_valid(uint32_t addr){
                 assert(addr < size);
-                // printf("read_data_valid\taddr:%d,result:%lx\n",addr,reg_data_valid[addr / (sizeof(reg_data_valid[0]) * 8)]);
                 return (reg_data_valid[addr / (sizeof(reg_data_valid[0]) * 8)] & (1ull << (addr % (sizeof(reg_data_valid[0]) * 8))));
             }
 

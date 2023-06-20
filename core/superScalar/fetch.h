@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-06-09 17:39:12
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-03-31 20:40:22
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-24 10:43:01
- * @Description: 
- */
 #pragma once
 #include <queue>
 #include "../common.h"

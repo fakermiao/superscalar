@@ -203,12 +203,6 @@ struct int_def{
 };
 const uint64_t counter_mask = (1<<0) | (1<<2);
 
-// struct satp_def{
-//     uint64_t ppn    : 44;
-//     uint64_t asid   : 16;
-//     uint64_t mode   : 4;
-// };
-
 struct csr_cause_def{
     uint64_t cause : 63;
     uint64_t interrupt : 1;

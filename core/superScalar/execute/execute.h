@@ -8,7 +8,6 @@
 #pragma once
 #include "../../common.h"
 #include "../../config.h"
-#include "../issue_execute.h"
 #include "../../component/fifo.h"
 #include "../../component/memory.h"
 #include "../wb.h"

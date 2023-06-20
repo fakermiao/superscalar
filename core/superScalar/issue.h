@@ -32,8 +32,6 @@ namespace Supercore{
                 issue_q(issue_q),rename_issue_fifo(rename_issue_fifo),issue_alu_fifo(issue_alu_fifo),
                 issue_bru_fifo(issue_bru_fifo),issue_csr_fifo(issue_csr_fifo),issue_lsu_fifo(issue_lsu_fifo),issue_mdu_fifo(issue_mdu_fifo),
                 issue_mou_fifo(issue_mou_fifo),phy_regfile(phy_regfile),cp(cp){}
-                // decode_issue_fifo(decode_issue_fifo),issue_execute_fifo(issue_execute_fifo),issue_q(component::fifo<instStr>(ISSUE_QUEUE_SIZE))
-                // {}
             component::issue_queue<instStr>& issue_q;
             component::fifo<rename_issue_pack> *rename_issue_fifo;
             component::fifo<instStr> **issue_alu_fifo;

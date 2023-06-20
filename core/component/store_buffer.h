@@ -73,7 +73,6 @@ namespace component{
             uint64_t get_value(uint64_t addr,uint64_t size,uint64_t mem_value){
                 uint64_t result = mem_value;
                 uint32_t cur_id;
-                // this->print();
                 if(get_front_id(&cur_id)){
                     auto first_id = cur_id;
                     do{
@@ -133,7 +132,6 @@ namespace component{
                     sync_request_q.pop();
                     switch(req_t.req){
                         case sync_request_type::push:
-                            // printf("store_buffer push pc:%lx\n",req_t.store_buffer_item_t.pc);
                             this->push(req_t.store_buffer_item_t);
                             break;
                         default:

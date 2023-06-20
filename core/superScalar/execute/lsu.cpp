@@ -34,8 +34,9 @@ namespace Supercore{
                                 instInfo.rd_enable = true;
                                 instInfo.rd_value = sign_extend(lsu_value,8);
                             }else{
-                                instInfo.has_execp = true;
-                                instInfo.execp_id  = exp_id;
+                                instInfo.has_execp   = true;
+                                instInfo.execp_id    = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -49,6 +50,7 @@ namespace Supercore{
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -63,6 +65,7 @@ namespace Supercore{
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -70,12 +73,14 @@ namespace Supercore{
                             int64_t buf;
                             rv_exc_code exp_id = mem_read(lsu_addr,8,(unsigned char*)&buf);
                             if(exp_id == exc_custom_ok){
+                                printf("ld pc:%lx,inst:%x,addr:%lx\n",instInfo.pc,instInfo.inst,lsu_addr);
                                 lsu_value = store_buffer->get_value(lsu_addr,8,buf);
                                 instInfo.rd_enable = true;
                                 instInfo.rd_value = lsu_value;
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -89,6 +94,7 @@ namespace Supercore{
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -102,6 +108,7 @@ namespace Supercore{
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -115,6 +122,7 @@ namespace Supercore{
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id = exp_id;
+                                instInfo.execp_value = lsu_addr;
                             }
                             break;
                         }
@@ -295,6 +303,7 @@ namespace Supercore{
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = execp_id;
+                                instInfo.execp_value = instInfo.rs1_value;
                             }
                             break;
                         }

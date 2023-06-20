@@ -79,7 +79,6 @@ namespace Supercore{
                             instInfo.execp_value = jump_pc;
                             instInfo.rd_enable  = false;
                             exe_channel.rd_enable = false;
-                            printf("jal execption\n");
                         }else{
                             instInfo.rd_enable = true;
                             instInfo.rd_value  = instInfo.pc + 4;
@@ -94,7 +93,6 @@ namespace Supercore{
                             instInfo.execp_value = jump_pc;
                             instInfo.rd_enable = false;
                             exe_channel.rd_enable = false;
-                            printf("jalr execption pc:%lx\n",jump_pc);
                         }else{
                             instInfo.rd_enable = true;
                             instInfo.rd_value  = instInfo.pc + 4;
@@ -107,7 +105,6 @@ namespace Supercore{
                             instInfo.has_execp = true;
                             instInfo.execp_id  = exc_instr_misalign;
                             instInfo.execp_value = jump_pc;
-                            printf("bru execption\n");
                         }
                     }
                     instInfo.bru_jump = jump;

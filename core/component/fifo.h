@@ -5,13 +5,7 @@
  * @LastEditTime: 2023-06-08 14:20:33
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-02-17 19:36:38
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-03-27 14:33:51
- * @Description: 
- */
+
 #ifndef COM_FIFO_H
 #define COM_FIFO_H
 #include "../common.h"

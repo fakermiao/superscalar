@@ -687,6 +687,7 @@ class Priv{
             sstatus->spp = U_MODE;
             cur_need_trap = true;
             trap_pc = sepc;
+            printf("sepc:%lx\n",trap_pc);
             return true;
         }
         bool mret(){

@@ -48,9 +48,9 @@ component::memory mem(0,0x80000000);
 //0615: fix lsu bugs, all I instructions test execpt ma_data、simple，all M instructions test
 //0616: 修改原子指令逻辑，成功跑通所有原子指令，之前原子指令逻辑错误，没有写回寄存器的值
 //step2. test virtual address
-const char *load_path = "test/rv64ui/rv64ui-v-add.bin";
+// const char *load_path = "test/rv64ui/rv64ui-v-add.bin";
 // const char *load_path = "test/rv64um/rv64um-v-div.bin";
-// const char *load_path = "test/rv64ua/rv64ua-v-lrsc.bin";
+const char *load_path = "test/rv64ua/rv64ua-v-amoswap_d.bin";
 // const char *load_path = "test/fw_payload.bin";
 
 ram dram(4096ul*1024l*1024l,(unsigned long)0x0000,load_path);
@@ -82,12 +82,8 @@ component::fifo<instStr> *mdu_wb_fifo[MDU_UNIT_NUM];
 component::fifo<instStr> *mou_wb_fifo[MOU_UNIT_NUM];
 
 component::fifo<fetch_decode_pack> fetch_decode_fifo(FETCH_DECODE_FIFO_SIZE);
-// component::fifo<decode_issue_pack> decode_issue_fifo(DECODE_RENAME_FIFO_SIZE);
 component::fifo<decode_rename_pack> decode_rename_fifo(DECODE_RENAME_FIFO_SIZE);
 component::fifo<rename_issue_pack> rename_issue_fifo(RENAME_ISSUE_FIFO_SIZE);
-            // issue(component::fifo<rename_issue_pack> *rename_issue_fifo,component::fifo<instStr> **issue_alu_fifo,component::fifo<instStr> **issue_bru_fifo,
-            //     component::fifo<instStr> **issue_csr_fifo,component::fifo<instStr> **issue_lsu_fifo,component::fifo<instStr> **issue_mdu_fifo,
-            //     component::fifo<instStr> **issue_mou_fifo,component::regfile<uint64_t> *phy_regfile,component::checkpoint_buffer *cp)
 
 static Supercore::bru_feedback_pack bru_feedback;
 static Supercore::wb_feedback_pack  wb_feedback;

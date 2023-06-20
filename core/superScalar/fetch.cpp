@@ -5,19 +5,10 @@
  * @LastEditTime: 2023-06-09 17:20:15
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-03-31 20:40:33
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-24 17:19:01
- * @Description: 
- */
 #include "fetch.h"
 namespace Supercore{
     void fetch::evaluate(bru_feedback_pack bru_feedback_pack_t,wb_feedback_pack wb_feedback_pack_t){
         /*先按照简单逻辑写，后面根据nutshell进行修改而且还要根据分支预测、缓存进行修改*/
-        // printf("FETCH\tpc:%lx,jump:%d,feedback_enable:%d,feedback_pc:%lx,feedback_jump:%d\n",this->pc,this->jump_wait,
-        // bru_feedback_pack_t.enable,bru_feedback_pack_t.next_pc,bru_feedback_pack_t.jump);
         if(!(wb_feedback_pack_t.enable && wb_feedback_pack_t.flush))
         {
             if(jump_wait){
@@ -54,7 +45,6 @@ namespace Supercore{
                         instStr fetch_info;
                         memset(&fetch_info,0,sizeof(fetch_info));
                         uint32_t inst_v = 0;
-                        // mem->read(this->pc,&inst_v,4);
                         rv_exc_code exp_id = priv.va_if(this->pc,4,(uint8_t*)&inst_v);
                         if(exp_id == exc_custom_ok){
                             fetch_info.valid = true;
@@ -73,7 +63,6 @@ namespace Supercore{
                         bool jump = ((inst_v & 0x7f) == 0x6f) || ((inst_v & 0x7f) == 0x67) || ((inst_v & 0x7f) == 0x63);
 
                         if(jump){
-                            // get_prediction(uint64_t pc,uint32_t inst,bool *jump,uint64_t *next_pc)
                             bool jump_result;
                             uint64_t jump_next_pc;
                             if(bp->get_prediction(this->pc,inst_v,&jump_result,&jump_next_pc)){

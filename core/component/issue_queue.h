@@ -98,7 +98,7 @@ namespace component{
                         if(!item_issued_found){
                             if((i < issued_list.size()) && (cur_id == issued_list[i])){
                                 item_issued_found = true;
-                                i++;//fix compress error
+                                i++;
                                 next_id = cur_id;
                                 new_wstage = cur_stage;
                                 new_wptr = cur_id;

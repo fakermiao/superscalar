@@ -54,12 +54,6 @@ struct l2cache_set{
 template <int nr_ways = L2_WAYS,int nr_sets = L2_NR_SETS,int sz_cache_line = L2_SZLINE,int nr_max_slave = 32>
 class l2_cache{
 public:
-    // const int uncached_mmio_read_ticks = 10;
-    // const int uncached_mmio_write_ticks= 10;
-    // const int dram_read_ticks = 30;
-    // const int dram_write_ticks = 30;
-    // const int cacheline_fetch_ticks = 10;
-    // const int cacheline_write_ticks = 10;
     
     //uncached operations{
     /*uncached operation will not check existing cache status,
@@ -222,7 +216,6 @@ private:
             return;
         }
         if(select_set->status[way_id] == L2_SLAVE_EXCLUSIVE){
-            // printf("l2 exclusive\n");
             for(uint32_t i = 0;i < slaves.size();i++)
                 if(select_set->shared_slave[way_id][i]){
                     slaves[i]->invalidate_exclusive(addr);

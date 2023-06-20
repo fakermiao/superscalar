@@ -12,7 +12,6 @@
 
 namespace Supercore{
     void issue::evaluate(wb_feedback_pack wb_feedback_pack_t,exe_feedback_t exe_feedback){
-        /*目前只考虑果壳的顺序单发情况，多发的情况考虑后面再处理（涉及到一个周期内译码的指令不能全部放入发射队列要暂停的情况）*/
         this->debug_issue_num = 0;
         if(!(wb_feedback_pack_t.enable && wb_feedback_pack_t.flush)){
 
@@ -71,7 +70,6 @@ namespace Supercore{
                         cur_inst.rs2_enable = true;
                         cur_inst.rs2_value  = 0;
                     }
-                    // printf("issue pc:%lx,rs1_ready:%d,rs2_ready:%d\n",cur_inst.pc,rs1_ready,rs2_ready);
                     //处理反馈，可以不需要,0613 check no problem
                     for(uint32_t i = 0;i < EXECUTE_UNIT_NUM;i++){
                         if(exe_feedback.exe_channel[i].rd_enable){
@@ -176,7 +174,6 @@ namespace Supercore{
                 auto modified = false;
                 do{
                     auto cur_inst = issue_q.get_item(cur_id);
-                    // printf("pc:%lx,rs1_phy:%d,rs2_phy:%d\n",cur_inst.pc,cur_inst.rs1_phy,cur_inst.rs2_phy);
                     for(uint32_t i = 0;i < EXECUTE_UNIT_NUM;i++){
                         if(exe_feedback.exe_channel[i].rd_enable){
                             if(cur_inst.rs1_valid && !cur_inst.rs1_enable && (cur_inst.rs1_phy == exe_feedback.exe_channel[i].rd_id)){
@@ -191,7 +188,6 @@ namespace Supercore{
                             }
                         }
                         if(wb_feedback_pack_t.wb_channel[i].rd_enable){
-                            // printf("wb feedback:%d\n",wb_feedback_pack_t.wb_channel[i].rd_id);
                             if(cur_inst.rs1_valid && !cur_inst.rs1_enable && (cur_inst.rs1_phy == wb_feedback_pack_t.wb_channel[i].rd_id)){
                                 cur_inst.rs1_enable = true;
                                 cur_inst.rs1_value = wb_feedback_pack_t.wb_channel[i].rd_value;
@@ -274,7 +270,6 @@ namespace Supercore{
                                 }
                             }
                         }
-                        // printf("issue push\tpc:%lx,rs1_enable:%d,rs2_enable:%d\n",rev_pack.rename_issue[i].pc,rev_pack.rename_issue[i].rs1_enable,rev_pack.rename_issue[i].rs2_enable);
                         issue_q.push(rev_pack.rename_issue[i]);
                     }
                 }

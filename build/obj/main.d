@@ -31,7 +31,6 @@
  core/superScalar/rename.h core/superScalar/rename_issue.h \
  core/superScalar/issue.h core/superScalar/../component/issue_queue.h \
  core/superScalar/../component/fifo.h core/superScalar/execute/execute.h \
- core/superScalar/execute/../issue_execute.h \
  core/superScalar/execute/../../component/memory.h \
  core/superScalar/execute/alu.h core/superScalar/execute/mdu.h \
  core/superScalar/execute/csr.h core/superScalar/execute/lsu.h \

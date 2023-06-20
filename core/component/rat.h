@@ -97,7 +97,6 @@ namespace component{
             }            
 
             void restore_map(uint32_t new_phy_id,uint32_t old_phy_id){
-                // printf("restore_map new_phy_id:%d,old_phy_id:%d\n",new_phy_id,old_phy_id);
                 assert(new_phy_id < phy_reg_num);
                 assert(old_phy_id < phy_reg_num);
                 assert(get_valid(new_phy_id));
@@ -112,7 +111,6 @@ namespace component{
             }
 
             void release_map(uint32_t phy_id){
-                // printf("release map:%d\n",phy_id);
                 assert(phy_id < phy_reg_num);
                 assert(get_valid(phy_id));
                 assert(!get_visible(phy_id));
@@ -134,7 +132,6 @@ namespace component{
 
             bool get_phy_id(uint32_t arch_id,uint32_t *phy_id){
                 int cnt = 0;
-                // printf("arch_id:%d,phy_id:%d,valid:%d,visible:%d\n",arch_id,phy_map_table[4],get_valid(4),get_visible(4));
                 assert((arch_id >0) && (arch_id < arch_reg_num));
                 for(uint32_t i = 0;i < phy_reg_num;i++){
                     if(get_valid(i) && get_visible(i) && (phy_map_table[i] == arch_id)){
@@ -165,8 +162,6 @@ namespace component{
                 if(ret){
                     set_visible(old_phy_id,false);
                 }
-                // printf("\033[31mset map: arch_id:%d,phy_id:%d,old_phy_id:%d,visible:%d\033[0m\n",arch_id,phy_id,old_phy_id,get_visible(old_phy_id));
-                // printf("after set map:arch_id:%d\n",phy_map_table[32]);
                 return old_phy_id;
             }
 

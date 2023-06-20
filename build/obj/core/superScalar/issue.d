@@ -24,7 +24,6 @@
  core/superScalar/../component/rat.h core/superScalar/../component/rob.h \
  core/superScalar/../component/store_buffer.h core/superScalar/../color.h \
  core/superScalar/execute/execute.h \
- core/superScalar/execute/../issue_execute.h \
  core/superScalar/execute/../../component/fifo.h \
  core/superScalar/execute/../execute.h core/superScalar/execute/alu.h \
  core/superScalar/execute/bru.h core/superScalar/execute/mdu.h

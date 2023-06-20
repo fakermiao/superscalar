@@ -41,9 +41,6 @@ namespace Supercore{
                 if((rat->get_free_phy_id(phy_need_cnt,free_phy_list) >= phy_need_cnt) && (rob->get_free_space() >= rob_need_cnt)){
                     component::rob_item rob_item_t[RENAME_WIDTH];
                     //map from rat、rob
-                    // for(uint32_t i = 0;i < phy_need_cnt;i++){
-                    //     printf("%d/%d\t:%d\n",i,phy_need_cnt,free_phy_list[i]);
-                    // }
                     for(uint32_t i = 0,j = 0;i < RENAME_WIDTH; i++){
                         memset(&rob_item_t[i],0,sizeof(rob_item_t[i]));
                         if(rev_pack.decode_issue[i].enable){
@@ -58,7 +55,6 @@ namespace Supercore{
                             memcpy(&rob_item_t[i].fuOpType,&rev_pack.decode_issue[i].fuOpType,sizeof(rob_item_t[i].fuOpType));
 
                             if(rev_pack.decode_issue[i].rd_valid && (rev_pack.decode_issue[i].rd_id != 0)){
-                                // assert(rat->get_phy_id(rob_item_t[i].Areg,&rob_item_t[i].OPreg));
                                 rob_item_t[i].OPreg_v = rat->get_phy_id(rob_item_t[i].Areg,&rob_item_t[i].OPreg);
                                 rob_item_t[i].Preg = free_phy_list[j++];
                                 send_pack.rename_issue[i].rd_phy = rob_item_t[i].Preg;
@@ -86,11 +82,9 @@ namespace Supercore{
                     for(uint32_t i = 0;i < RENAME_WIDTH;i++){
                         if(rev_pack.decode_issue[i].enable){
                             if(rev_pack.decode_issue[i].rs1_valid && (rev_pack.decode_issue[i].rs1_id != 0)){
-                                // printf("inst:%x,rs1_id:%d\n",rev_pack.decode_issue[i].inst,rev_pack.decode_issue[i].rs1_id);
                                 assert(rat->get_phy_id(rev_pack.decode_issue[i].rs1_id,&send_pack.rename_issue[i].rs1_phy));
                             }
                             if(rev_pack.decode_issue[i].rs2_valid && (rev_pack.decode_issue[i].rs2_id != 0)){
-                                // printf("inst:%x,rs2_id:%d\n",rev_pack.decode_issue[i].inst,rev_pack.decode_issue[i].rs2_id);
                                 assert(rat->get_phy_id(rev_pack.decode_issue[i].rs2_id,&send_pack.rename_issue[i].rs2_phy));
                             }
                         }
@@ -134,15 +128,6 @@ namespace Supercore{
                         if(rev_pack.decode_issue[i].enable){
                             //write rob
                             assert(rob->push(rob_item_t[i],&send_pack.rename_issue[i].rob_id));
-
-                            // if(rev_pack.decode_issue[i].valid && rev_pack.decode_issue[i].predicted && rev_pack.decode_issue[i].checkpoint_id_valid){
-                            //     component::checkpoint_t cp_t,cp_s;
-                            //     brs_cp.clone(cp_t);
-                            //     cp_s = cp->get_item(rev_pack.decode_issue[i].checkpoint_id);
-                            //     cp_t.global_history = cp_s.global_history;
-                            //     cp_t.local_history  = cp_s.local_history;
-                            //     cp->set_item_sync(rev_pack.decode_issue[i].checkpoint_id,cp_t);
-                            // }
                             this->rename_p(i,send_pack.rename_issue[i]);
                         }
                     }
