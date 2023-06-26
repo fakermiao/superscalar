@@ -41,8 +41,10 @@ namespace Supercore{
             void evaluate(bru_feedback_pack bru_feedback_pack_t,wb_feedback_pack wb_feedback_pack_t);
 
             void fetch_p(uint32_t num,instStr& instInfo){
-                printf("%sfetch%s%d/%ld%s:\tpc:%lx,inst:%08x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
-                printf("\t\tpredicted:%d,pred_jump:%d,pred_pc:%lx\n",instInfo.predicted,instInfo.predicted_jump,instInfo.predicted_next_pc);
+                if(cpu.cycle > DIFFTEST_CYC){
+                    printf("%sfetch%s%d/%ld%s:\tpc:%lx,inst:%08x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
+                    printf("\t\tpredicted:%d,pred_jump:%d,pred_pc:%lx\n",instInfo.predicted,instInfo.predicted_jump,instInfo.predicted_next_pc);
+                }
             }
     };
 }

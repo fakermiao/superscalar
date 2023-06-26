@@ -36,9 +36,11 @@ namespace Supercore{
             void evaluate(wb_feedback_pack wb_feedback_pack_t);
 
             void rename_p(uint32_t num,instStr& instInfo){
+                if(cpu.cycle > DIFFTEST_CYC){
                 printf("%srename%s%d/%ld%s:\tpc:%lx,inst:%x,rob_id:%d\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst,instInfo.rob_id);
                 printf("\t\trs1_valid:%d,rs1_phy:%d--rs2_valid:%d,rs2_phy:%d--rd_valid:%d,rd_phy:%d\n",instInfo.rs1_valid,instInfo.rs1_phy,instInfo.rs2_valid,
                 instInfo.rs2_phy,instInfo.rd_valid,instInfo.rd_phy);
+                }
             }
     };
 }

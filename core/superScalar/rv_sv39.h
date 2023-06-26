@@ -65,8 +65,10 @@ class rv_sv39{
             }
         }
         sv39_tlb_entry* local_tlbe_get(satp_def satp,uint64_t va){
-            sv39_va *va_struct = (sv39_va*)&va;
-            assert((va_struct->blank == 0b1111111111111111111111111 && (va_struct->vpn_2 >> 8)) || (va_struct->blank == 0 && ((va_struct->vpn_2 >> 8) == 0)));
+            // sv39_va *va_struct = (sv39_va*)&va;
+            // if(cpu.cycle > DIFFTEST_CYC)
+            //     printf("local tlb get:%lx\n",va);
+            // assert((va_struct->blank == 0b1111111111111111111111111 && (va_struct->vpn_2 >> 8)) || (va_struct->blank == 0 && ((va_struct->vpn_2 >> 8) == 0)));
             // we should raise access fault before call sv39
             sv39_tlb_entry *res = local_tlb_get(satp,va);
             if (res) {

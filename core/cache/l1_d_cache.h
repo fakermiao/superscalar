@@ -113,7 +113,7 @@ class l1_d_cache : public co_slave{
             if(pa + size <= 0x80000000){
                 return false;
             }
-            assert(pa % size == 0);
+            // assert(pa % size == 0);
             lr_pa = pa;
             lr_size = size;
             lr_valid = true;
@@ -213,7 +213,7 @@ class l1_d_cache : public co_slave{
             if(pa + size <= 0x80000000){
                 return false;
             }
-            assert(pa % size == 0);
+            // assert(pa % size == 0);
             l1_d_cache_set <nr_ways,sz_cache_line,nr_sets> *select_set = &set_data[get_index(pa)];
             int way_id;
             if(!lr_valid || lr_pa != pa || lr_size != size || !(select_set->match(pa,way_id)) || select_set->status[way_id] == L1_SHARED){
@@ -228,7 +228,7 @@ class l1_d_cache : public co_slave{
 
         bool super_pa_amo_op(uint64_t pa,uint64_t size,LSUOpType op,int64_t src,int64_t &dst,int64_t &store){
             if(pa + size <= 0x80000000) return false;
-            assert(pa % size == 0);
+            // assert(pa % size == 0);
             lr_valid = false;
             bool fetch_res = l1_include_exclusive(pa);
             if(!fetch_res) return false;

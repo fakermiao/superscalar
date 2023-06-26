@@ -35,7 +35,7 @@ ip & ie register:
 #include "../../cache/l1_d_cache.h"
 
 namespace Supercore{
-static bool riscv_test = true;
+static bool riscv_test = false;
 class Priv{
     public:
         Priv(component::memory *mem,uint64_t hart_id,l2_cache<L2_WAYS,L2_NR_SETS,L2_SZLINE,32> &l2):mem(mem),hart_id(hart_id),l2(l2),i_tlb(l2,hart_id),
@@ -93,7 +93,6 @@ class Priv{
             assert(!cur_need_trap);
             cur_need_trap = true;
             bool trap_to_s = false;
-            // printf("PRIV raise trap\tmtvec:%lx\n",mtvec);
             /*中断/异常默认自陷到m态执行，通过mideleg、medeleg设置来委托到s态处理*/
             if(cur_priv != M_MODE){
                 // printf("TRAP_PC\t\n");
@@ -669,7 +668,6 @@ class Priv{
             csr_cause_def cause;
             cause.cause = cur_priv + 8;
             cause.interrupt = 0;
-            printf("ecall\n");
             raise_trap(cur_pc,cause);
         }
         void ebreak(){
@@ -687,7 +685,6 @@ class Priv{
             sstatus->spp = U_MODE;
             cur_need_trap = true;
             trap_pc = sepc;
-            printf("sepc:%lx\n",trap_pc);
             return true;
         }
         bool mret(){

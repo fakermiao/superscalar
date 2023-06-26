@@ -128,6 +128,8 @@ namespace Supercore{
                         if(rev_pack.decode_issue[i].enable){
                             //write rob
                             assert(rob->push(rob_item_t[i],&send_pack.rename_issue[i].rob_id));
+                            // if(cpu.cycle > 326630)
+                            //     printf("rename cycle:%ld, enable:%d\n",cpu.cycle,rob->is_empty());
                             this->rename_p(i,send_pack.rename_issue[i]);
                         }
                     }

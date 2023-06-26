@@ -19,7 +19,6 @@ namespace Supercore{
                 if(instInfo.valid){
                     int64_t src1 = instInfo.rs1_value;
                     int64_t src2 = instInfo.rs2_valid ? instInfo.rs2_value : instInfo.imm;
-                    printf("src1:%lx,src2:%lx\n",src1,src2);
                     int64_t mdu_result;
                     switch(instInfo.fuOpType.mduOp){
                         case MDUOpType::mul:{

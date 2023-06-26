@@ -49,10 +49,10 @@ CPU_state cpu;
 
 component::memory mem(0,0x80000000);
 // const char *load_path = "test/rv64mi/rv64mi-p-illegal.bin";
-const char *load_path = "test/rv64ui/rv64ui-p-add.bin";
+// const char *load_path = "test/rv64ui/rv64ui-p-add.bin";
 // const char *load_path = "test/rv64um/rv64um-v-div.bin";
 // const char *load_path = "test/rv64ua/rv64ua-v-lrsc.bin";
-// const char *load_path = "test/fw_payload.bin";
+const char *load_path = "test/fw_payload.bin";
 
 ram dram(4096ul*1024l*1024l,(unsigned long)0x0000,load_path);
 l2_cache <L2_WAYS,L2_NR_SETS,L2_SZLINE,32> l2;
@@ -78,7 +78,7 @@ static core::issue issue_s(&decode_issue_fifo,&issue_execute_fifo);
 static core::execute execu_s(&issue_execute_fifo,&execute_wb_fifo,priv);
 static core::wb wb_s(&execute_wb_fifo,priv,true,&bp,&cp);
 
-struct diff_context_t ref;
+// struct diff_context_t ref;
 void init(){
     assert(l2.add_dev(0x2000000,0x10000,&clint));
     assert(l2.add_dev(0xc000000,0x4000000,&plic));

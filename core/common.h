@@ -25,6 +25,10 @@
 #include <cctype>
 typedef uint64_t REG_WIDTH;
 
+//163545524 cycle 错误分支路径上得访存会导致sv39 71行的assert出错
+#define DIFFTEST_CYC 363545450
+
+
 enum class FuType{
     alu,bru,csr,lsu,mdu,mou
 };

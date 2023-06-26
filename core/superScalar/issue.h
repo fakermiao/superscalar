@@ -48,10 +48,12 @@ namespace Supercore{
             virtual void evaluate(wb_feedback_pack wb_feedback_pack_t,exe_feedback_t exe_feedback);
 
             void issue_p(uint32_t num,instStr& instInfo,uint32_t unit_num){
-                printf("%sissue%s%d/%ld%s:\tpc:%lx,inst:%x,rob_id:%d,uint_num:%d\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst,
+                if(cpu.cycle > DIFFTEST_CYC){
+                    printf("%sissue%s%d/%ld%s:\tpc:%lx,inst:%x,rob_id:%d,uint_num:%d\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst,
                         instInfo.rob_id,unit_num);
-                printf("\t\trs1_valid:%d,rs1_phy:%d--rs2_valid:%d,rs2_phy:%d--rd_valid:%d,rd_phy:%d\n",instInfo.rs1_valid,instInfo.rs1_phy,instInfo.rs2_valid,
-                instInfo.rs2_phy,instInfo.rd_valid,instInfo.rd_phy);
+                    printf("\t\trs1_valid:%d,rs1_phy:%d--rs2_valid:%d,rs2_phy:%d--rd_valid:%d,rd_phy:%d\n",instInfo.rs1_valid,instInfo.rs1_phy,instInfo.rs2_valid,
+                    instInfo.rs2_phy,instInfo.rd_valid,instInfo.rd_phy);
+                }
             }
     };
 }

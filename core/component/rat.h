@@ -75,7 +75,6 @@ namespace component{
                 memset(phy_map_table_visible,0,sizeof(uint32_t) * bitmap_size);
                 freelist.flush();
 
-                /*第一次测试用，后面可删去*/
                 for(uint32_t i = 0;i < ARCH_REG_NUM;i++){
                     set_valid(i,true);
                     set_visible(i,true);
@@ -97,6 +96,7 @@ namespace component{
             }            
 
             void restore_map(uint32_t new_phy_id,uint32_t old_phy_id){
+                // printf("restore map new phy id:%d,old phy id:%d\n",new_phy_id,old_phy_id);
                 assert(new_phy_id < phy_reg_num);
                 assert(old_phy_id < phy_reg_num);
                 assert(get_valid(new_phy_id));
@@ -235,7 +235,7 @@ namespace component{
             }
             bool cp_get_valid(checkpoint_t &cp,uint32_t phy_id){
                 assert(phy_id < phy_reg_num);
-                return cp.rat_phy_map_table_valid[phy_id / BITSIZE(cp.rat_phy_map_table_valid)] & (1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_valid)));
+                return cp.rat_phy_map_table_valid[phy_id / BITSIZE(cp.rat_phy_map_table_valid[0])] & (1ULL << (phy_id % BITSIZE(cp.rat_phy_map_table_valid)));
             }
             void cp_set_visible(checkpoint_t &cp,uint32_t phy_id,bool v){
                 assert(phy_id < phy_reg_num);
