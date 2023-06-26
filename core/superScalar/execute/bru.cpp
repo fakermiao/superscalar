@@ -20,7 +20,7 @@ namespace Supercore{
             if(!issue_bru_fifo->is_empty() && !bru_wb_fifo->is_full()){
                 instStr instInfo;
                 this->issue_bru_fifo->pop(&instInfo);
-                // printf("bru\trs1:%lx,rs2:%lx\n",instInfo.rs1_value,instInfo.rs2_value);
+
                 if(instInfo.valid){
                     bool jump = false;
                     uint64_t jump_pc = 0;

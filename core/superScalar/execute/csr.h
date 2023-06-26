@@ -37,7 +37,8 @@ namespace Supercore{
             }
 
             void csr_p(instStr& instInfo){
-                // printf("%scsr%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
+                if(cpu.cycle >= DIFFTEST_CYC)
+                    printf("%scsr%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
             }
     };
 }

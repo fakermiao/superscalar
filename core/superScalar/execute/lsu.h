@@ -42,7 +42,7 @@ namespace Supercore{
             }
     
             void lsu_p(instStr& instInfo){
-                if(cpu.cycle > DIFFTEST_CYC)
+                if(cpu.cycle >= DIFFTEST_CYC)
                     printf("%slsu%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
             }
     };

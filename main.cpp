@@ -49,13 +49,13 @@ component::memory mem(0,0x80000000);
 //0616: 修改原子指令逻辑，成功跑通所有原子指令，之前原子指令逻辑错误，没有写回寄存器的值
 //step2. test virtual address
 // const char *load_path = "test/rv64ui/rv64ui-v-add.bin";
-// const char *load_path = "test/rv64um/rv64um-p-div.bin";
+const char *load_path = "test/rv64um/rv64um-p-div.bin";
 // const char *load_path = "test/rv64ua/rv64ua-v-amoswap_d.bin";
 /*
 rv64mi illegal pass
 */
 // const char *load_path = "test/rv64si/rv64si-p-sbreak.bin";
-const char *load_path = "test/fw_payload.bin";
+// const char *load_path = "test/fw_payload.bin";
 
 ram dram(4096ul*1024l*1024l,(unsigned long)0x0000,load_path);
 l2_cache <L2_WAYS,L2_NR_SETS,L2_SZLINE,32> l2;
@@ -104,7 +104,7 @@ Supercore::csr    *csr_stage[CSR_UNIT_NUM];
 Supercore::lsu    *lsu_stage[LSU_UNIT_NUM];
 Supercore::mdu    *mdu_stage[MDU_UNIT_NUM];
 Supercore::mou    *mou_stage[MOU_UNIT_NUM];
-Supercore::wb     wb_stage(priv,false,&bp,&cp,alu_wb_fifo,bru_wb_fifo,csr_wb_fifo,lsu_wb_fifo,mdu_wb_fifo,mou_wb_fifo,
+Supercore::wb     wb_stage(priv,true,&bp,&cp,alu_wb_fifo,bru_wb_fifo,csr_wb_fifo,lsu_wb_fifo,mdu_wb_fifo,mou_wb_fifo,
                             &rat,&rob,&phy_regfile,&storeBuffer);
 
 void init(){

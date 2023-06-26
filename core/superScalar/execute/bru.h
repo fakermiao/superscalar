@@ -78,7 +78,7 @@ inline void bru_exec(instStr &inst,bru_feedback_pack *feed_pack){
             execute_channel evaluate(wb_feedback_pack wb_feedback);
             
             void bru_p(instStr& instInfo){
-                if(cpu.cycle > DIFFTEST_CYC){
+                if(cpu.cycle >= DIFFTEST_CYC){
                     printf("%sbru%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
                     printf("\t\tbranch_jump:%d,branch_pc:%lx,result:%lx\n",instInfo.bru_jump,instInfo.bru_next_pc,instInfo.rd_value);
                 }

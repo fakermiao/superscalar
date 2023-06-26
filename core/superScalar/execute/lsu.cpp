@@ -279,7 +279,7 @@ namespace Supercore{
                             int64_t amo_result;
                             int64_t store_result;
                             rv_exc_code execp_id = priv.super_va_amo(instInfo.rs1_value,8,instInfo.fuOpType.lsuOp,instInfo.rs2_value,amo_result,store_result);
-                            // printf("hello lsu amoadd_d\n");
+
                             if(execp_id == exc_custom_ok){
                                 component::store_buffer_item item;
                                 item.enable = true;

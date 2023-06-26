@@ -79,7 +79,7 @@ typedef struct wb_feedback_pack{
             virtual wb_feedback_pack evaluate();
 
             void wb_p(uint32_t num,component::rob_item& item){
-                if(cpu.cycle > DIFFTEST_CYC){
+                if(cpu.cycle >= DIFFTEST_CYC){
                     printf("%sWB%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,item.pc,item.inst);
                     printf("\t\trd:%d,rd_value:%lx\n",item.Preg,item.rd_value);
                 }

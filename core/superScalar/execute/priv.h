@@ -142,7 +142,6 @@ class Priv{
             assert(mstatus->blank1 == 0);
             assert(mstatus->blank2 == 0);
             assert(mstatus->blank4 == 0);
-            // cur_priv = next_priv;
         }
         uint64_t get_trap_pc(){
             return trap_pc;

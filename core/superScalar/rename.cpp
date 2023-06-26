@@ -58,7 +58,6 @@ namespace Supercore{
                                 rob_item_t[i].OPreg_v = rat->get_phy_id(rob_item_t[i].Areg,&rob_item_t[i].OPreg);
                                 rob_item_t[i].Preg = free_phy_list[j++];
                                 send_pack.rename_issue[i].rd_phy = rob_item_t[i].Preg;
-                                //have bugs
                                 rat->set_map_sync(rob_item_t[i].Areg,rob_item_t[i].Preg);
                                 rat->cp_set_map(brs_cp,rob_item_t[i].Areg,rob_item_t[i].Preg);//更新最新映射关系，set_map_sync有延迟
                             }else{
@@ -128,8 +127,6 @@ namespace Supercore{
                         if(rev_pack.decode_issue[i].enable){
                             //write rob
                             assert(rob->push(rob_item_t[i],&send_pack.rename_issue[i].rob_id));
-                            // if(cpu.cycle > 326630)
-                            //     printf("rename cycle:%ld, enable:%d\n",cpu.cycle,rob->is_empty());
                             this->rename_p(i,send_pack.rename_issue[i]);
                         }
                     }

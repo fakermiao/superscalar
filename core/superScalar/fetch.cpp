@@ -8,7 +8,6 @@
 #include "fetch.h"
 namespace Supercore{
     void fetch::evaluate(bru_feedback_pack bru_feedback_pack_t,wb_feedback_pack wb_feedback_pack_t){
-        /*先按照简单逻辑写，后面根据nutshell进行修改而且还要根据分支预测、缓存进行修改*/
         if(!(wb_feedback_pack_t.enable && wb_feedback_pack_t.flush))
         {
             if(jump_wait){

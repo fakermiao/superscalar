@@ -5,13 +5,6 @@
  * @LastEditTime: 2023-06-06 15:23:03
  * @Description: 
  */
-/*
- * @Author: 苗金标
- * @Date: 2023-04-16 21:03:02
- * @LastEditors: 苗金标
- * @LastEditTime: 2023-05-09 16:24:36
- * @Description: 
- */
 #pragma once
 
 #include "../common.h"
@@ -34,9 +27,7 @@ struct sv39_tlb_entry{
     bool     D; //dirty    
 };
 
-// uint64_t pa_pc;
-
-template <unsigned int nr_tlb_entry = 32, bool is_data = true>//is_data用来区分itlb、dtlb
+template <unsigned int nr_tlb_entry = 32, bool is_data = true>//is_data distinction itlb、dtlb
 class rv_sv39{
     public:
         rv_sv39(l2_cache<L2_WAYS,L2_NR_SETS,L2_SZLINE,32> &bus,uint64_t slave_id):bus(bus){
@@ -65,9 +56,8 @@ class rv_sv39{
             }
         }
         sv39_tlb_entry* local_tlbe_get(satp_def satp,uint64_t va){
+            //the flow two line is for debug,but in superscala a instruction may in failure path dute to branch prediction so remove this
             // sv39_va *va_struct = (sv39_va*)&va;
-            // if(cpu.cycle > DIFFTEST_CYC)
-            //     printf("local tlb get:%lx\n",va);
             // assert((va_struct->blank == 0b1111111111111111111111111 && (va_struct->vpn_2 >> 8)) || (va_struct->blank == 0 && ((va_struct->vpn_2 >> 8) == 0)));
             // we should raise access fault before call sv39
             sv39_tlb_entry *res = local_tlb_get(satp,va);
@@ -111,8 +101,6 @@ class rv_sv39{
                 uint64_t search_addr = pt_addr+((i==2?va->vpn_2:(i==1?va->vpn_1:va->vpn_0))*sizeof(sv39_pte));
                 bool res = bus.pa_read_cached(search_addr,sizeof(sv39_pte),(uint8_t*)&pte);
                 if(!res){
-                    // printf("pt_addr=%lx, vpn=%lx\n",pt_addr,((i==2?va->vpn_2:(i==1?va->vpn_1:va->vpn_0))));
-                    // printf("\nerror ptw pa=%lx, level=%d, satp=%lx\n",pt_addr+((i==2?va->vpn_2:(i==1?va->vpn_1:va->vpn_0))*sizeof(sv39_pte)),i,*(uint64_t *)&satp);
                     return false;
                 }
                 if(!pte.V || (!pte.R && pte.W) || pte.reserved || pte.PBMT){

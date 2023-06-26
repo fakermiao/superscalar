@@ -49,7 +49,6 @@ namespace Supercore{
                 //遍历发射队列找到可以发射的指令
                 bool has_lsu = false;
                 do{
-                    // printf("issue\tid:%d\n",id);
                     instStr cur_inst = issue_q.get_item(id);
                     bool issued = false;
                     bool rs1_ready = false;
@@ -164,7 +163,6 @@ namespace Supercore{
                         }
                     }
                 }while(issue_q.get_next_id(id,&id) && (id != first_id) && (issued_list.size() < ISSUE_WIDTH));
-                // this->issue_q.compress(issued_list);//compress要如果sync会出现下面set_item_sync使用旧id,compress后set_item使用新id的不对等情况
             }
 
             //step2.接收exectue、wb执行返回唤醒issue_q队列的指令
@@ -304,7 +302,6 @@ namespace Supercore{
                 issue_mou_fifo[i]->flush();
             }
             issue_q.flush();
-            // issue_execute_fifo->flush();
         }
     }
 }

@@ -46,7 +46,6 @@ namespace Supercore{
     } 
 
     void wb::execption_handler(){
-        // assert(0);
         uint32_t tail_id;
         uint32_t head_id;
         assert(rob->get_front_id(&head_id));
@@ -101,7 +100,6 @@ namespace Supercore{
                 instStr instInfo;
                 lsu_wb_fifo[i]->pop(&instInfo);
                 auto rob_item_t = rob->get_item(instInfo.rob_id);
-                // printf("pc:%lx,value:%lx\n",instInfo.pc,instInfo.rd_value);
                 this->set_rob_item(rob_item_t,instInfo);
                 rob->set_item(instInfo.rob_id,rob_item_t);
             }
@@ -135,7 +133,6 @@ namespace Supercore{
             rv_exc_code int_code = priv.check_and_raise_int();
             rob->get_front(&rob_item);
             feed_pack.rob_enable = rob->get_front_id(&feed_pack.rob_next);
-            // assert(rob_item.pc != 0x800107dc);
             if(int_code != exc_custom_ok && (!priv.need_trap())){
                 uint64_t cause_code = static_cast<uint64_t>(int_code);
                 priv.raise_trap(rob_item.pc,csr_cause_def(cause_code,1));
@@ -188,8 +185,6 @@ namespace Supercore{
                                 csr_cause_def cause(rob_item.execp_id);
                                 priv.raise_trap(rob_item.pc,cause,rob_item.inst);
                             }else{
-                                // printf("pc:%lx,execp_id:%d,execp value:%lx\n",rob_item.pc,rob_item.execp_id,rob_item.execp_value);
-                                // assert(0);
                                 csr_cause_def cause(rob_item.execp_id);
                                 priv.raise_trap(rob_item.pc,cause,rob_item.execp_value);
                             }
@@ -200,7 +195,6 @@ namespace Supercore{
                             feed_pack.wb_channel[commit_num].rd_id     = rob_item.rd_id;
                             feed_pack.wb_channel[commit_num].rd_value  = rob_item.rd_value;
                             phy_regfile->write_sync(rob_item.Preg,rob_item.rd_value,true);
-                            // printf("pc:%lx,rob_value:%lx\n",rob_item.pc,rob_item.rd_value);
                             {
                                 //for riscv test
                                 if(!rat->get_phy_id(10,&arch10_feedback))
@@ -214,11 +208,6 @@ namespace Supercore{
                             //for debug
                             uint32_t arch_id = rat->get_arch_id(rob_item.Preg);
                             cpu.gpr[arch_id] = rob_item.rd_value;
-
-                            // if(rob_item.OPreg_v){
-                            //     phy_regfile->write_sync(rob_item.OPreg,0,false);
-                            //     rat->release_map_sync(rob_item.OPreg);
-                            // }
                         }
                         if(!rob_item.has_execp){
                             if(rob_item.rd_valid){
@@ -239,15 +228,10 @@ namespace Supercore{
                                     case LSUOpType::amoaddw: case LSUOpType::amoxorw: case LSUOpType::amoandw: case LSUOpType::amoorw:
                                     case LSUOpType::amominw: case LSUOpType::amomaxw: case LSUOpType::amominuw: case LSUOpType::amomaxuw:{
                                         component::store_buffer_item store_item;
-                                        // memset(&store_item,0,sizeof(store_item));
-                                        // store_buffer->print();
                                         store_buffer->pop(&store_item);
                                         assert(store_item.enable);
-                                        // printf("write pc:%lx,addr:%lx,value:%lx\n",store_item.pc,store_item.addr,store_item.data);
                                         if(store_item.size){
                                             if(store_item.addr % store_item.size != 0){
-                                                // csr_cause_def cause(rob_item.execp_id);
-                                                // priv.raise_trap(rob_item.pc,cause,rob_item.inst);
                                                 csr_cause_def cause(exc_store_misalign);
                                                 priv.raise_trap(rob_item.pc,cause,store_item.addr);
                                             }else{
@@ -267,15 +251,12 @@ namespace Supercore{
                                 if(rob_item.predicted){   
                                     if((rob_item.bru_jump == rob_item.predicted_jump) && ((rob_item.bru_next_pc == rob_item.predicted_next_pc) ||
                                         (!rob_item.predicted_jump))){
-                                            // printf("branch predicted hit\n");
                                         bp->update_prediction(rob_item.pc,rob_item.inst,rob_item.bru_jump,rob_item.bru_next_pc,true,0);
                                         cp->pop();
                                     }else if(rob_item.checkpoint_id_valid){
-                                        // printf("branch predicted miss\n");
                                         auto cp_t = cp->get_item(rob_item.checkpoint_id);
                                         bp->update_prediction(rob_item.pc,rob_item.inst,rob_item.bru_jump,rob_item.bru_next_pc,false,cp_t.global_history);
                                         if(rob_item.OPreg_v){
-                                            // printf("hello:%d\n",rob_item.OPreg);
                                             rat->cp_release_map(cp_t,rob_item.OPreg);
                                         }
                                         uint32_t _cnt = 0;
@@ -294,7 +275,6 @@ namespace Supercore{
                                         rat->restore_sync(cp_t);
                                         phy_regfile->restore_sync(cp_t);
                                         cp->flush();
-                                        // rat->flush();
                                         rob->flush();
                                         store_buffer->flush();
                                         feed_pack.enable = true;
@@ -306,7 +286,6 @@ namespace Supercore{
                                     }
                                 }else{
                                     cp->flush();
-                                    // rat->flush();
                                     rob->flush();
                                     store_buffer->flush();
                                     feed_pack.enable = true;
@@ -333,7 +312,6 @@ namespace Supercore{
                     }else{
                         csr_cause_def cause(rob_item.execp_id);
                         uint64_t tval = (rob_item.execp_id == exc_illegal_instr) ? (rob_item.inst) : (rob_item.pc);
-                        // printf("invalid pc:%lx,inst:%x,trap:%d,tval:%x\n",rob_item.pc,rob_item.inst,rob_item.execp_id,rob_item.inst);
                         priv.raise_trap(rob_item.pc,cause,tval);
                         feed_pack.flush = true;
                         feed_pack.enable = true;

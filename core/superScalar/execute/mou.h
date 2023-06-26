@@ -26,7 +26,8 @@ namespace Supercore{
             execute_channel evaluate(wb_feedback_pack wb_feedback);
 
             void mou_p(instStr& instInfo){
-                // printf("%smou%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
+                if(cpu.cycle >= DIFFTEST_CYC)
+                    printf("%smou%s%d/%ld%s:\t\tpc:%lx,inst:%x\n",FORMATFETCH,FORMATCLC,num,cpu.cycle,FORMATEND,instInfo.pc,instInfo.inst);
             }    
     };
 }
