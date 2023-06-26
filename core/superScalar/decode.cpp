@@ -43,7 +43,7 @@ namespace Supercore{
                         if(send_pack.decode_issue[i].valid){
                             switch(inst->r_type.opcode){
                                 case 0x37:{//lui
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_u,32);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_u,32);
                                     send_pack.decode_issue[i].rs1_valid = false;
                                     send_pack.decode_issue[i].rs1_id    = 0;
                                     send_pack.decode_issue[i].rs2_valid = false;
@@ -55,7 +55,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x17:{//auipc
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_u,32);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_u,32);
                                     send_pack.decode_issue[i].rs1_valid = false;
                                     send_pack.decode_issue[i].rs1_id    = 0;
                                     send_pack.decode_issue[i].rs2_valid = false;
@@ -67,7 +67,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x6f:{//jal
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_j,21);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_j,21);
                                     send_pack.decode_issue[i].rs1_valid = false;
                                     send_pack.decode_issue[i].rs1_id    = 0;
                                     send_pack.decode_issue[i].rs2_valid = false;
@@ -79,7 +79,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x67:{//jalr
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_i,12);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_i,12);
                                     send_pack.decode_issue[i].rs1_valid = true;
                                     send_pack.decode_issue[i].rs1_id    = inst->i_type.rs1;
                                     send_pack.decode_issue[i].rs2_valid = false;
@@ -91,7 +91,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x63:{//beq bne blt bge bltu bgeu
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_b,13);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_b,13);
                                     send_pack.decode_issue[i].rs1_valid = true;
                                     send_pack.decode_issue[i].rs1_id    = inst->b_type.rs1;
                                     send_pack.decode_issue[i].rs2_valid = true;
@@ -127,7 +127,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x03:{//lb,lh,lw,ld,lbu,lhu,lwu
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_i,12);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_i,12);
                                     send_pack.decode_issue[i].rs1_valid = true;
                                     send_pack.decode_issue[i].rs1_id    = inst->i_type.rs1;
                                     send_pack.decode_issue[i].rs2_valid = false;
@@ -166,7 +166,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x23:{//sb,sh,sw,sd
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_s,12);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_s,12);
                                     send_pack.decode_issue[i].rs1_valid = true;
                                     send_pack.decode_issue[i].rs1_id    = inst->s_type.rs1;
                                     send_pack.decode_issue[i].rs2_valid = true;
@@ -196,7 +196,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x13:{//OPIMM
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_i,12);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_i,12);
                                     send_pack.decode_issue[i].rs1_valid = true;
                                     send_pack.decode_issue[i].rs1_id    = inst->i_type.rs1;
                                     send_pack.decode_issue[i].rs2_valid = false;
@@ -246,7 +246,7 @@ namespace Supercore{
                                     break;
                                 }
                                 case 0x1B:{//OPIMM32
-                                    send_pack.decode_issue[i].imm       = sign_extend(imm_i,12);
+                                    send_pack.decode_issue[i].imm       = SEXT(imm_i,12);
                                     send_pack.decode_issue[i].rs1_valid = true;
                                     send_pack.decode_issue[i].rs1_id    = inst->i_type.rs1;
                                     send_pack.decode_issue[i].rs2_valid = false;

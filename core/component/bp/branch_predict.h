@@ -236,7 +236,7 @@ class branch_predictor : public baseBp{
                 case 0x6f:{//jal
                     need_jump_prediction = false;
                     instruction_next_pc_valid = true;
-                    instruction_next_pc = pc + sign_extend(imm_j,21);
+                    instruction_next_pc = pc + SEXT(imm_j,21);
                     if(rd_is_link)
                         main_ras.push_addr(pc + 4);
                     break;
@@ -279,7 +279,7 @@ class branch_predictor : public baseBp{
                 case 0x63:{//beq bne blt bge bltu bgeu
                     need_jump_prediction = true;
                     instruction_next_pc_valid = !cpht_get_prediction(pc) ? local_get_prediction(pc) : gshare_get_prediction(pc);
-                    instruction_next_pc       = instruction_next_pc_valid ? (pc + sign_extend(imm_b,13)) : (pc + 4);
+                    instruction_next_pc       = instruction_next_pc_valid ? (pc + SEXT(imm_b,13)) : (pc + 4);
                     break;
                 }
                 default:    

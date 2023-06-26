@@ -32,7 +32,7 @@ namespace Supercore{
                             if(exp_id == exc_custom_ok){
                                 lsu_value = store_buffer->get_value(lsu_addr,1,buf);
                                 instInfo.rd_enable = true;
-                                instInfo.rd_value = sign_extend(lsu_value,8);
+                                instInfo.rd_value = SEXT((int64_t)lsu_value,8);
                             }else{
                                 instInfo.has_execp   = true;
                                 instInfo.execp_id    = exp_id;
@@ -46,7 +46,7 @@ namespace Supercore{
                             if(exp_id == exc_custom_ok){
                                 lsu_value = store_buffer->get_value(lsu_addr,2,buf);
                                 instInfo.rd_enable = true;
-                                instInfo.rd_value  = sign_extend(lsu_value,16);
+                                instInfo.rd_value  = SEXT((int64_t)lsu_value,16);
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = exp_id;
@@ -60,7 +60,7 @@ namespace Supercore{
                             if(exp_id == exc_custom_ok){
                                 lsu_value = store_buffer->get_value(lsu_addr,4,buf);
                                 instInfo.rd_enable = true;
-                                instInfo.rd_value  = sign_extend(lsu_value,32);
+                                instInfo.rd_value  = SEXT((int64_t)lsu_value,32);
                             }else{
                                 instInfo.has_execp = true;
                                 instInfo.execp_id  = exp_id;
@@ -322,7 +322,7 @@ namespace Supercore{
                                 else{
                                     store_buffer->push_sync(item);
                                     instInfo.rd_enable = true;
-                                    instInfo.rd_value  = sign_extend(amo_result,32);
+                                    instInfo.rd_value  = SEXT(amo_result,32);
                                 }
                             }else{
                                 instInfo.has_execp = true;

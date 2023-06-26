@@ -26,7 +26,7 @@
 typedef uint64_t REG_WIDTH;
 
 //163545524 cycle 错误分支路径上得访存会导致sv39 71行的assert出错
-#define DIFFTEST_CYC 0
+#define DIFFTEST_CYC 1000000000
 
 
 enum class FuType{
@@ -206,13 +206,13 @@ union rv_instr {
 #define BITMASK(bits) ((1ull << (bits)) - 1)
 #define BITS(x, hi, lo) (((x) >> (lo)) & BITMASK((hi) - (lo) + 1)) // similar to x[hi:lo] in verilog
 
-inline uint64_t sign_extend(uint64_t imm, uint64_t imm_length)
-{
-    assert((imm_length > 0) && (imm_length < 64));
-    auto sign_bit = (imm >> (imm_length - 1)) << 63;
-    auto extended_imm = ((sign_bit == 0) ? 0 : (((sign_bit << (64 - imm_length)) - 1) << imm_length)) | (imm << (64 - imm_length) >> (64 - imm_length));
-    return extended_imm;
-}
+// inline uint64_t sign_extend(uint64_t imm, uint64_t imm_length)
+// {
+//     assert((imm_length > 0) && (imm_length < 64));
+//     auto sign_bit = (imm >> (imm_length - 1)) << 63;
+//     auto extended_imm = ((sign_bit == 0) ? 0 : (((sign_bit << (64 - imm_length)) - 1) << imm_length)) | (imm << (64 - imm_length) >> (64 - imm_length));
+//     return extended_imm;
+// }
 
 //初始时，gpr要设置为0但gpr_v要设置为true;
 struct CPU_state
